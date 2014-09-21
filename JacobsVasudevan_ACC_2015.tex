@@ -16,20 +16,24 @@
 \newtheorem{prop}[thm]{Proposition}
 \newtheorem{cor}[thm]{Corollary}
 \newtheorem{lem}[thm]{Lemma}
+\newtheorem{ass}[thm]{Assumption}
+
 
 % MATH OPERATORS
 \DeclareMathOperator{\Diff}{Diff}
 \DeclareMathOperator{\Fr}{Fr}
 \DeclareMathOperator{\GL}{GL}
 \DeclareMathOperator{\Dens}{Dens}
+\DeclareMathOperator{\pr}{pr}
 
 \title{\LARGE \bf
-  An advection scheme for probabilty densities on manifolds
+  A 
+  multiscale
+  advection scheme for
+  densities on manifolds
 }
 
-
 \author{Henry O. Jacobs and Ram Vasudevan}% <-this % stops a space
-
 
 \begin{document}
 
@@ -40,9 +44,13 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-Half densities, advection, blah blah blah...
-WTF, is this why they call it an ``abstract''?!
-
+  Consider the task of computing a probability density advected by an 
+  autonomous dynamical system.
+  Existing schemes exhibit numerical artifacts such as negative probability densities and fairly weak convergence results if any.
+  In this article we present a method whith a relatively strong
+  convergence result, which also preseves the sign of densities.
+  Moreover, we use dense charts to transport the machinary of wavelet analysis to manifolds.
+  This allows us to implement our method on a variety of non-Euclidean spaces at multiple length scales.
 \end{abstract}
 
 
@@ -56,7 +64,7 @@ WTF, is this why they call it an ``abstract''?!
   density $p$ by
   \begin{align}
     p( x ; t) = 
-    | \det( D\Phi_X^t(x) ) |^{-1} p_0( \Phi_X^t(x) ), \label{eq:push_forward}
+    \left| \det\left[ D\Phi_X^t(x) \right] \right|^{-1} p_0\left( \left[\Phi_X^t\right]^{-1}(x) \right), \label{eq:push_forward}
   \end{align}
   where $D\Phi_X^t(x)$ is the Jacobian matrix of
   $\Phi_X^t$ at the point $x \in \R^n$.
@@ -126,6 +134,9 @@ WTF, is this why they call it an ``abstract''?!
   This method will yield reconstructed probability measures
   which are non-negative and mass conserving at any finite resolution.
 
+\subsection{Notation}
+  Manifolds, tangent bundles, vector fields, closure of a set (bar notation)
+
 \section{Mathematical preliminaries}
 \label{sec:math}
   Throughout this section we will have the following
@@ -138,7 +149,7 @@ WTF, is this why they call it an ``abstract''?!
   A smooth density on $M$ is a smooth means of
   assigning real numbers to measureable sets.
   Hueristically, it is a map which
-  takes an infinitesiaml box (or volume element)
+  takes an infinitesimal box (or volume element)
   on a manifold as input, and outputs the infinitesimal ``size''
   of the box (a real number, possibly negative).
   Therefore, in order to discuss densities,
@@ -170,7 +181,7 @@ WTF, is this why they call it an ``abstract''?!
   Now that we understand frames (i.e. infinitesimal boxes)
   sufficiently well, we may introduce the notion of \emph{densities}.
 
-  \begin{defn}
+  \begin{defn}[see Appendix A \cite{BatesWeinstein1997}]
     \label{eq:density}
     Let $\alpha > 0$.
     An $\alpha$-\emph{density} on a manifold, $M$, is a map
@@ -221,14 +232,13 @@ WTF, is this why they call it an ``abstract''?!
     and defines an inner-product on $\Dens^{1/2}(M)$.
   \end{proof}
 
-  Note that for any diffeomophism $\Phi \in \Diff(M)$,
-  there is a map $\Fr(\Phi) : \Fr M \to \Fr M$ defined by
-  \begin{align*}
-    \Fr(\Phi) \cdot (e_1,\dots,e_n) = 
-    (T\Phi \cdot e_1,\dots,T\Phi \cdot e_n).
-  \end{align*}
+  Note that for any $C^1$ diffeomorphism $\Phi:M \to M$,
+  there is a map $\Fr(\Phi) : \Fr M \to \Fr M$
+  given by 
+  ``$(e^1,\dots,e^n) \mapsto (T\varphi \cdot e^1, \dots, T\varphi \cdot e^n)$''.
   This defines the \emph{pull-back} of an $\alpha$-density
-  $\nu \in \Dens^\alpha(M)$ by $\Phi^* \nu := \nu \circ \Fr(\Phi)$.
+  $\nu \in \Dens^\alpha(N)$
+  by $\Phi^* \nu := \nu \circ \Fr(\Phi) \in \Dens^\alpha(M)$.
   \begin{prop} \label{prop:isom}
     Let $\Phi \in \Diff(M)$.
     The transformation ``$\psi \mapsto \Phi^* \psi$'' for
@@ -329,82 +339,363 @@ WTF, is this why they call it an ``abstract''?!
 
 \subsection{Euclidean realizations}
 \label{sec:euclidean}
-We would like to apply wavelet theory later for the purpose of the
-error bounds and sparsity structure they will bring us.
-However, the notion of wavelets on manifolds is still in development,
-and virtually all of the available packages are for wavelets on
-Euclidean spaces.
-This motivates us to prove the following theorem.
+  We would like to apply wavelet theory later for the purpose of the
+  error bounds and sparsity structure they will bring us.
+  However, the notion of wavelets on manifolds is still in development,
+  and virtually all of the available packages are for wavelets on
+  Euclidean spaces.
+  In this section we will present theorems which allow
+  us to transform analysis on manifolds into problems
+  of analysis on subspaces of functions on $\R^n$.
+  For convenience we will use the non-standard convention
+  that charts map open sets in $\R^n$ into manifolds.
+  This is equivalent to replacing all charts in the standard
+  convection with their inverse maps.
 
-\begin{thm} \label{thm:global_chart}
-  Let $M$ be a manifold and let
-  $\phi:U \subset M \to V \subset \mathbb{R}^n$
-  be a chart such that $\bar{U} = M$.
-  Then the subspace of half-densities over $V$ given by
-  $(i_U \circ \phi^{-1})^* \Dens^{1/2}(M)$ is isomorphic
-  to $\Dens^{1/2}(M)$.
+  The key to this section is the use of almost global charts
+  which may include coordinate singularities.
+  We find that if the coordinate singularities are given
+  proper attention, all the data on the original manifold
+  may be recovered on a Euclidean domain.
+
+\begin{thm} \label{thm:Euclidean}
+  Let $\varphi : V \subset \R^n \to U \subset M$ be a chart on 
+  a compact $C^k$-manifold $M$ such that $U$ is dense in $M$.
+  We can extend $\varphi$ to a surjective map
+  $\bar{\varphi}: \bar{V} \to M$ such that
+  $M$ is $C^k$-diffeomorphic to $\bar{V} / \bar{\varphi}$.
 \end{thm}
 \begin{proof}
-  Elements of $(i_U \circ \phi^{-1})^* \Dens^{1/2}(M)$
-  are half-densities on $V \subset \mathbb{R}^n$ given by
-  $ \left. \psi \right|_{U} \circ \Fr(\phi)$ for some
-  $\psi \in \Dens^{1/2}(M)$.
-  Thus the map $\psi \mapsto \psi|_U \circ \Fr(\phi)$
-  provides a surjection.
-  We wish to show that this map is also an injection.
-  Specifically this means, given 
-  $\left. \psi \right|_{U} \circ \Fr(\phi)$ in
-  $(i_U \circ \phi^{-1})^*\Dens^{1/2}(M)$ the half-density $\psi$ is
-  uniquely determined.
-  To prove this, assume that there exists another half-density,
-  $\tilde{\psi}$, such that
-  $\tilde{\psi}|_U \circ \phi^{-1} = \psi|_U \circ \phi^{-1}$.
-  For any $x \in V$ and ${\bf e}_x \in \Fr_x(V)$ we observe that
-  \begin{align*}
-    \tilde{\psi}( \Fr_x(\varphi) \cdot {\bf e}_x) =
-    \psi( \Fr_x( \varphi) \cdot {\bf e}_x).
-  \end{align*}
-  Applying this over all $x \in V$ matches $\psi$ and $\tilde{\psi}$ on
-  the subset $U \subset M$.
-  Therefore, the only place where $\psi$ and $\tilde{\psi}$ may differ 
-  is on $M \ U$.
-  As $U$ is dense, $M$ is compact, and $\psi|_U$ is continous,
-  the Tietze extension theorem yields a unique $C^0$ extension
-  $\psi|_U$ to $M$.  This unique extension must be none other
-  that $\psi$ itself, and so $\psi = \tilde{\psi}$.
+  Let $\{x_k\}$ we a sequence in $V$ which converges to the boundary
+  of $\bar{V}$, then $\varphi(x_k)$ converges to a unique point in
+  $M \backslash U$ because $M$ is compact and $\varphi$ is continous.
+  This extends $\varphi$ to the boundary of $\bar{V}$.
+
+  Observe that $\bar{\varphi}( \bar{V} ) = \bar{U} = M$.
+  By construction $\bar{\varphi}$ is injective on $\bar{V} / \bar{\varphi}$.
+  Thus $\bar{\varphi}$ is a bijection from $\bar{V} / \bar{\varphi}$ to $M$.
+  
+  We have shown equivalence as sets.
+  To obtain equivalence as topological spaces use
+  the quotient topology induced by $\bar{\varphi}$.
+  To obtain $C^k$-equivalence, use the quotient topology
+  induced by the $k$th order jet of $\varphi$
+  and continuously extend to $\bar{V}$.
+  \footnote{This entails interpreting the $k$th order Taylor expansions
+  of $\varphi$ as  a map to the space of multidimensional polynomials.
+  We then apply the same argument used to prove equivalence as topological
+  spaces to this map.}
 \end{proof}
 
-  Theorem \ref{thm:global_chart} is useful because in translates
-  PDEs on manifolds into PDEs on subsets of $\mathbb{R}^n$.
+  As an example consider the $2$-sphere, $S^2 \subset \R^3$.
+  If we use spherical coordinates we obtain a map
+  $\varphi: (-\pi,\pi) \times (0,\pi) \to U \subset S^2$
+  given by
+  \begin{align*}
+    \chi(\theta,\phi) = \begin{pmatrix}
+      \cos(\theta) \sin(\phi) \\
+      \sin(\theta) \sin(\phi) \\
+      \cos(\phi)
+      \end{pmatrix}.
+  \end{align*}
+  The extension of $\varphi$ is the surjective map
+  $\bar{\varphi}:[-\pi,\pi] \times [0,\pi] \to S^2$ where 
+  $\bar{\varphi}(\theta, 0 ) = (0,0,1)$ and
+  $\bar{\varphi}(\theta, \pi) = (0,0,-1)$
+  for all $\theta \in (-\pi,\pi)$,
+  and $\bar{\varphi}(-\pi,\phi) = \bar{\varphi}( \pi,\phi)$
+  for any $\phi \in (0,\pi)$,
+  and $\bar{\varphi}(\theta,\phi) = \varphi(\theta,\phi)$
+  everywhere else.
+  Theorem \ref{thm:Euclidean} tells us that $S^2$ is diffeomorphic
+  to $[-\pi,\pi] \times [0,\pi]$ with the boundary points of the form
+  $(\theta,0)$ identified with each other, and the point $(-\pi,\phi)$
+  identified with $(\pi,\phi)$ for all $\phi \in (0,\pi)$.
+
   One concern is the assumption that there exists a chart which
   is dense.  However, if $M$ is compact such a chart is guaranteed
-  to exist.  This follows from the fact that any manifold can have
-  a Riemannian structures placed upon it, and compact Riemannian
-  manifolds are geodesically complete.
-  The Riemannian exponential map at a point in the manifold
-  yields a star-shaped dense chart whose boundary is the cut-locus
-  of the given point \cite{Sakai1996}.
+  to exist.
+
+  \begin{prop}
+  If $M$ is compact then there exists a chart whose domain is dense in $M$.
+  \end{prop}
+  \begin{proof}
+  Without loss of generality we will assume that $M$ is connected.
+  If $M$ is not connected we may apply the following argument to each component.
+  Equip $M$ with a Riemannian structure.
+  We may then invoke Lemma 4.4 of \cite{Sakai1996}.
+  This completes the proof, but we can provide details for the sake of 
+  completeness (pun intended).
+  For any $p \in M$ we can define the cut-locus by $C_p$ and the maximal open set $U_p \subset T_p M$ over which $\exp_p : T_p M \to M$ is injective.
+  We see that $U = \exp_p(U_p)$ is dense in $M$.
+  Upon choosing a basis, ${\bf e}_1,\dots,{\bf e}_n \in T_xM$,
+   we obtain a chart $\varphi: V \subset \mathbb{R}^n \to U \subset M$.
+  Here $V$ is a star shaped subset of $\mathbb{R}^n$.
+  In particular, $\varphi(x) = \exp_p ( x^i {\bf e}_i )$.
+  \end{proof}
+
   The existence of such a chart in the non-compact case is unclear
-  at this time.
+  at this time.  More importantly,
+  although the proof is constructive (via Riemannian exponential maps)
+  this construction is not practical.
+  Typically the Riemannian exponential and the cut-locus are difficult
+  to compute. Despite this limitation,
+  we will find that a fairly large variety of manifolds can be handled.
 
-\begin{defn}
-  Let $M$ be a compact connected manifold (with or without boundary), and let $\phi:U \subset M \to V \subset \mathbb{R}^n$ be a chart such that $U$ is dense in $M$.
-  Let $W_s \subset C^k(\bar{V})$ be a nested sequence of function spaces
-  with respect to the paramenter $s \in S$.
-  We call the pair $(\phi, W_s)$ a \emph{Euclidean realization of $M$}
-  if $\phi^* i_V^*W_s \subset i_{U}^* C^k(M)$ for each $s$ and $\cup_s \phi^*i_V^*W_s$ is dense in $i_{U}^*C^k(M)$.
-\end{defn}
+  For us, the most important aspects are the following
+  \begin{cor}\label{prop:functions_spaces}
+    Let $M$ be a manifold with a dense chart 
+    $\varphi:V \subset \R^n \to U \subset M$.
+    The space $\Dens^\alpha(M)$ is isomorphic to the subspaces of 
+    $\Dens^\alpha(\bar{V})$ given by
+    \begin{align*}
+      \bar{\varphi}^*\Dens^\alpha(M) := \{ \nu \circ \Fr(\bar{\varphi})
+      \mid \nu \in \Dens^\alpha(M) \} \subset \Dens^\alpha( \bar{V}).
+    \end{align*}
+    The same construction yields $\mathfrak{X}(M)$ as isomorphic
+    to a subalgebra 
+    $\bar{\varphi}^* \mathfrak{X}(M) \subset \mathfrak{X}(\bar{V})$
+    and $C^k(M)$ as isomorphic to a subring
+    $\bar{\varphi}^* C^k(M) \subset C^k(\bar{V})$.
+  \end{cor}
+  \begin{proof}
+    Recall that $\bar{\varphi}$ is surjective, but not injective
+    on the boundary of $\bar{V}$.
+    Let $\nu \in \Dens^\alpha(M), x \in V, e \in \Fr_x V, A \in \GL(n)$.
+    We observe
+    \begin{align*}
+      \nu( A \cdot [ \Fr_x(\varphi) \cdot e ] ) =
+      | \det(A) |^{\alpha} \nu( \Fr_x(\varphi) \cdot e)
+    \end{align*}
+    so that $\nu \circ \Fr(\varphi) \in \Dens^\alpha(V)$.
+    By continous extension to $\bar{V}$ we find
+    $\nu \circ \Fr(\bar{\varphi}) \in \Dens^\alpha(\bar{V})$.
+    Let $\nu$ and $\mu$ be $\alpha$ densities,
+    and let them differ on $M\backslash U$.
+    Then $\mu$ and $\nu$ must also differ on $U$ 
+    because $U$ is dense and $\nu$ and $\mu$ are continous.
+    This would imply that $\varphi^*\nu$ and $\varphi^*\mu$ differ.
+    Therefore, the map
+    $\nu \in \Dens^\alpha(M) \mapsto \bar{\varphi}^*\nu \in \Dens^\alpha(\bar{V})$ is injective.
+    By inspection this map is linear, so that the range is
+    a subspace of $\Dens^\alpha(\bar{V})$.
 
-The constraint ``$\phi^*i_V^*W_s \subset i_U^* C^k(M)$'' enforces that each of the spaces $W_s$ models the function space $i_U^* C^k(M)$ and nothing more.
-By theorem \ref{thm:global_chart}, $i_U^* C^k(M) = C^k(M)$, and thus $W_s$ models a subspace of the functions on $C^k(M)$.
-The second constraint ensures that elements of $i_U^* C^k(M)$ can be approximated by $W_s$ for some $s \in S$.
+    The same construction may be applied to vector-fields.
+    Let $X \in \mathfrak{X}(M)$.
+    We may restrict $X$ to $U$ and consider the pull-back
+    $\varphi^*(X|_U) := T\varphi^{-1} \cdot X|_U \circ \varphi \in \mathfrak{X}(V)$.
+    We may continously extend this to obtain a vector-field on $\bar{V}$.
+    \footnote{This is despite the fact that $\bar{\varphi}^{-1}$
+      does not exist.  We are merely using the fact that
+    $\varphi^*(X|_U)$ is continous on $V$.}
+    The same construction as before verifies injectivity.
+    Since all maps involved are Lie algebra morphisms, we obtain
+    a subalgebra of $\mathfrak{X}(\bar{V})$.
+
+    The same construction proves $C^k(M)$ is a subring of $C^k(\bar{V})$
+    via the ring morphism
+    $f \in C^k(M) \mapsto f \circ \bar{\varphi} \in C^k(\bar{V})$.
+  \end{proof}
+
 
 \section{An advection scheme}
 \label{sec:scheme}
+  In this section we will consider an advection scheme
+  for half-densities in lieu of solving \eqref{eq:advection}.
+  Let $V \subset \mathbb{R}^d$ be an open set and let
+  $\{ \psi_\lambda \in L^2(V)  \mid \lambda \in \Lambda\}$
+  be a wavelet-basis for some
+  subspace of $L^2(V)$ consisting of $C^k$ functions for some
+  integer $k > \frac{d}{2} + 1$.
+  For each scale-space index $\lambda \in \Lambda$
+  we denote the resolution level by $|\lambda|$.\todo{resolution level?}
+  Let $E^j$ denote the span of the wavelet functions
+  associated to resolution $2^{-j}$ and let 
+  $\pr_{E^j}: L^2(V) \to E^j$ be the orthogonal projection.
+  Given a smooth vector-field $X \in \mathfrak{X}(V)$
+  we can define the operator $D_X : C^k(V) \to C^{k-1}(V)$ 
+  given by
+  \begin{align*}
+    D_X[f](x) &=  \sqrt{\rho}(x) \left(  X^i (x) \partial_if(x) 
+      + \frac{1}{2} {\rm div}_{\rho}(X) f(x) \right)\\
+    &= \sum_{ | m | \leq 1 } a^m(x) \partial_{m}f(x).
+  \end{align*}
+  Where ``$m$'' is a dummy multi-index and $\rho(x) > 0$ everywhere.
+  The advection equation \eqref{eq:advection2} is then written
+  as $\partial_t \psi + D_X[\psi] = 0$ by identifying the space
+  of $C^k$ half-densities with the space of $C^k$ functions.
 
+  We could consider the operator on $E^j$ given by 
+  $D_X^{(j)} := \pr_{E^j} \circ \left. D_X \right|_{E^j}$
+  as a finite dimensional approximation of the Lie derivative of half-densities.
+  If this approximation is any good, then it might be reasonable to assume
+  the flow is continous, and approximate the evolution of $\psi$ by
+  \begin{align*}
+    \psi^{(j)}(t) = e^{t [X]^{(j)} } \cdot \psi_0 \in E^j \quad \forall t.
+  \end{align*}
+  If $\psi(t)$ is the solution to \eqref{eq:advection2},
+  we are curious to bound the error
+  \begin{align*}
+    e = \| \psi(t) - \psi^{(j)}(t) \|_{L^2}.
+  \end{align*}
+  This is the content of theorem \ref{thm:convergence}, to which
+  the next subsection is devoted.
 
 \subsection{Convergence}
 \label{sec:convergence}
+
+In this section we will use the following assumption
+
+\begin{ass}
+  Both $\psi_\lambda$ and $\tilde{\psi}_\mu$ have $C^{\alpha +1}$
+  smoothness and are orthogonal to polynomials of degree $n \geq \alpha -1$.
+\end{ass}
+
+We begin by bounding functions to their orthogonal
+projections in $E^j$.
+
+\begin{lem}[see Theorem 3.10.2 or 3.2.2 of \cite{Cohen2003}]
+  \label{lem:polynomials}
+  Let $f \in H^n(V)$, and let $j \geq \frac{d}{2}$.
+  Then
+  \begin{align*}
+    \| f - {\rm Poly_j}(f) \|_{L^2} \leq 2^{-nj} \| f \|_{H^n}
+  \end{align*}
+  where ${\rm Poly}_j$
+  is the orthogonal projection of $L^2(V)$ onto polynomials
+  of degree $j$.
+\end{lem}
+
+The following Lemma is equation 4.6.4 of \cite{Cohen2003}
+with ``$r=1$''.
+
+\begin{lem} \label{lem:entry_bounds}
+  Let $[X]_{\lambda\mu} := \langle \tilde{\psi}_\mu, D_X[\psi_\lambda] \rangle_{L^2}$.  Then
+  \begin{align*}
+    | [X]_{\lambda \mu} |\leq C 2^{- \left(\frac{(d+1)}{2}+ \alpha \right)| |\lambda| - |\mu| | }
+    2^{( |\lambda | + |\mu|)/2}.
+  \end{align*}
+  where $C > 0$ depends on $X$ through the $C^k$-norm of the coefficients $a^\alpha$.
+\end{lem}
+%   The following proof is taken from Example 1 in section 4.6 of \cite{Cohen2003}.
+% \begin{proof}
+%   By theorem 3.3.1 of \cite{Cohen2003} \todo{I don't really see how we are ausing Thm 3.3.1} and lemma \ref{lem:polynomials} we observe
+%   \begin{align*}
+%     | [X]_{\lambda \mu} | &\leq \inf_{g \in \Pi_n} \| D_X[\psi_\lambda] - g \|_{L^2( \supp(\tilde{\psi}_\mu) )} \\
+%     &\leq C_1 2^{-|\mu|\frac{n}{2}}\| D_X[\psi_\lambda] \|_{L^\infty} \\
+%     &\leq C_2 2^{-|\mu| \frac{n}{2}} \left( \sup_{\alpha} \| a^\alpha\|_{L^1 }  \right)
+%     ( \| \psi_\lambda \|_{L^\infty} + \| \nabla \psi_\lambda \|_{L^\infty} )
+%   \end{align*}
+%   and by the definition of wavelets
+%   \begin{align*}
+%     &\leq C_3 \left( \sup_{\alpha} \| a^\alpha\|_{L^1 }  \right) 2^{(|\lambda|-|\mu|)n/2} (n+1) 2^{|\lambda|}.
+%   \end{align*}
+%   The desired result then follows by swapping $\mu$ and $\lambda$
+%   and invoking the anti-symmetry of the operator $D_X$.
+% \end{proof}
+
+\begin{lem} \label{lem:DX_is_bounded}
+  $D_X$ is a bounded linear operator from $H^n(V)$ to $L^2(V)$.
+\end{lem}
+\begin{proof}
+  The coefficients $a^m$ are assumed smooth and bounded.
+  So that $D_X [f] = a^m \partial_m f \in H^{n-1} \subset L^2$.
+\end{proof}
+
+\begin{lem}  \label{lem:L2_to_Hn}
+  Let $D_X^{(j)} := \pr_{E^j} \circ \left. D_X \right|_{E^j} : E^j \to E^j$.
+  There exists a $C>0$ such that for all $f \in H^s$
+  \begin{align}
+    \| (D_X - D_X^{(j)})[\pr_{E^j}(f)] \|_{L^2} \leq C 2^{-n(j+1)/2} \| f\|_{L^2}.
+  \end{align}
+\end{lem}
+\begin{proof}
+  Let $[D_X]_{\lambda\mu} = \langle \psi_{\mu} , D_X[\psi_\lambda] \rangle_{L^2}$
+and similarly for $[D_X^{(j)}]_{\lambda \mu}$.
+Note that if $|\lambda|>j$ or $|\mu |>j$ then $[D_X^{(j)}]_{\lambda\mu} = 0$.
+We find
+  \begin{align*}
+    &\| (D_X - D_X^{(j)}) [\pr_{E^j}(f))] \|^2_{L^2} = \\
+    &\quad \sum_{\lambda \in \Lambda, |\mu | \leq j} \left| [D_X]_{\lambda\mu} - [D_X^j]_{\lambda\mu} \right|^2 |[ \pr_{E^j}(f)]_\mu|^2 \\
+    &\quad = \sum_{|\mu|\leq j}| f_\mu |^2 \sum_{|\lambda| > j} | [D_X]_{\lambda\mu}|^2.
+  \end{align*}
+  By Lemma \ref{lem:entry_bounds} we see
+  \begin{align*}
+    &\leq C' \sum_{|\mu|\leq j} | f_\mu |^2  \sum_{|\lambda| > j } 
+    2^{- \left( \frac{d+1}{2} + \alpha \right) | |\lambda| - |\mu| |}
+    2^{ (|\lambda| + |\mu|)/2 }\\
+    &\leq \sum_{|\mu | \leq j , |\lambda| > j}
+    |f_\mu|^2 2^{ - \left( \frac{d}{2} + \alpha \right)|\lambda|} 
+    2^{|\mu|\left(\frac{d}{2} + 1 - \alpha\right) }
+  \end{align*}
+  The term $2^{|\mu|( d/2 + 1 - \alpha)}$ is bounded 
+  by $ 2^{j(d/2 + 1 - \alpha)}$,
+  Thus we find
+  \begin{align*}
+    &\leq C \|f\|_{L^2}^2 2^{j \left( \frac{d}{2} + 1 - \alpha\right)} \sum_{\lambda > j}
+      2^{-|\lambda|\left( \frac{d}{2} + \alpha\right)} \\
+    &\leq C' \|f\|_{L^2}^2 2^{j \left( \frac{d}{2} + 1 - \alpha\right)}
+    \frac{ 2^{ -\left(\frac{d}{2} + \alpha \right)}}{ 1 - 2^{-\left(\frac{d}{2} + \alpha\right)}} \\
+    &\leq C'' \|f\|_{L^2}^2 2^{-(j+1) \alpha}.
+  \end{align*}
+\end{proof}
+  \begin{cor} \label{cor:operator_bound}
+    \begin{align*}
+      &\| D_X [f] - D_X^{(j)} [\pr_{E^j}(f)] \|_{L^2} \leq \\
+      &\quad C \left( 2^{-nj} + 2^{-\alpha(j+1)/2} \right) \|f\|_{H^n}.
+    \end{align*}
+  \end{cor}
+  \begin{proof}
+    This follows directly from the inequality
+    \begin{align*}
+      &\| D_X [f] - D_X[\pr_{E^j}(f)] + D_X[\pr_{E^j}(f)] - D_X^{(j)}[\pr_{E^j}(f)] \|_{L^2} \\
+      &\quad \leq \|D_X\|_{L^2} \| f - \pr_{E^j}(f)\|_{L^2}
+      + \| (D_X - D_X^{(j)}) [\pr_{E^j}(f)] \|_{L^2}.
+    \end{align*}
+    and lemmas \ref{lem:DX_is_bounded} and \ref{lem:L2_to_Hn}.
+  \end{proof}
+
+  \begin{lem} \label{lem:flow_bound}
+    Let $A$ and $B$ be anti-Hermetian operators on a Hilbert space.
+    Let $x(t)$ satisfy $\dot{x} = Ax$ and $y(t)$ satisfy $\dot{y} = By$.
+    If $x(0) = y(0)$ and $\| A - B \| < \epsilon$, then $u(t) = \| x(t) - y(t) \|$ satisfies $u(t) < \epsilon t \| y(0) \|$
+  \end{lem}
+ 
+  \begin{proof}
+    Note that $\langle Ax,x\rangle = \langle By,y \rangle = 0$.
+    Using this we calculate
+    \begin{align*}
+      \frac{du}{dt} &= \frac{1}{2u(t)} \langle
+      Ax(t) - By(t) , x(t) - y(t) \rangle \\
+      &= \frac{1}{2u(t)} \langle
+      (A-B)y(t) , x(t) - y(t) \rangle \\
+      &\leq \frac{1}{2u(t)} \| A-B\|  \|y(t)\|  \|x(t) - y(t) \| \\
+      &< \epsilon \|y(t) \|
+    \end{align*}
+    However $\| y(t) \| = \| y(0) \|$ since $B$ is anti-Hermetian.
+    Thus $\frac{du}{dt} < \epsilon \| y(0) \|$.
+    The result follows by integration.
+  \end{proof}
+  The upshot of Lemma \ref{lem:flow_bound} is that we can bound the
+  operator $D_X$ to $D_X^{(j)}$ when restricted to $H^n$.
+  \begin{thm}\label{thm:convergence}
+    Let $\psi_0 \in L^2(V)$ be such that $|\psi_0|^2$ is a probability distribution.
+    Then the flows of $\dot{\psi} = D_X[\psi]$ and $\dot{\psi}^{(j)} = D_X^{(j)}[\psi^{(j)}]$ with initial condition $\psi_0$
+    satisfies
+    \begin{align*}
+      &\| \psi(t) - \psi^{(j)}(t) \|_{L^2}  \\
+      &\quad\leq t( 2^{-nj} + 2^{-n(j+1)/2}) \| \psi_0\|_{H^n} .
+    \end{align*}
+  \end{thm}
+  \begin{proof}
+    Combining corollary \ref{cor:operator_bound} with lemma \ref{lem:flow_bound}
+    yields
+    \begin{align*}
+      &\| \psi(t) - \psi^{(j)}(t) \|_{L^2}  \\
+      &\quad\leq t( 2^{-nj} + 2^{-n(j+1)/2}) \| \psi_0 \|_{H^n} \| \psi_0 \|_{L^2}.
+    \end{align*}
+    That $|\psi_0|^2$ is a probability distribution means $\| \psi_0\|_{L^2} = 1$.
+  \end{proof}
 
 \subsection{Properties}
 \label{sec:properties}
@@ -412,15 +703,43 @@ Some propeties:  Positivity,
 Anti-symmetry (diagnolizable, easily exponentiated),
 mass conserving.
 
+\hoj{Still need to write this section}
 
 \section{Examples}
 \label{sec:Examples}
 
-\subsection{Comparison with Tranfer-operator methods}
-Consider the ODE $\dot{\theta} = \cos(\theta)$ on the unit circle, $S^1$.
+\subsection{Benchmark comparison with the Transfer-operator approach}
+Consider the ODE $X(x) = \sin(2x) \partial_x$ on the unit circle, $S^1$.
+We can solve for the flow in closed from.  We find
+$\Phi_X^t(x) = \arctan( e^{2t} \tan(x) )$.
+Using \eqref{eq:push_forward}
+we obtain the solution to \eqref{eq:advection} with initial condition $p_0(x)$ as the time-dependent density
+\begin{align*}
+  &p(x,t) = \\
+  &\quad p_0\left[ \arctan \left( \frac{ \tan(x)}{e^{2t}} \right)\right]
+  \left( e^{-2t} \cos^2(x) + e^{2t} \sin^2(x) \right).
+\end{align*}
+Similarly, the solution to \eqref{eq:advection2} with the initial condition $\psi_0(x)$ is the time-dependent half-density
+\begin{align*}
+  &\psi(x,t) = \\
+  &\quad \psi_0\left[\arctan\left( \frac{ \tan(x)}{e^{2t}} \right) \right]
+  \left( e^{-2t} \cos^2(x) + e^{2t} \sin^2(x) \right)^{1/2}. 
+\end{align*}
+We can use the Haar-wavelet to implement the method mentioned in \S \ref{sec:naive}.  This equivalent to partitioning the space into cells and computing fluxes \cite{FroylandJungeKoltai2013}.  We can implement our own method with respect to the Haar wavelet as well (i.e. \S \ref{sec:scheme}).  Snapshots are shown in figure \ref{fig:one_dim_system}.
+Both schemes appear accurate at time $t=1$ and earlier.
+However, the transfer operator method exhibits spurious oscillations and sign changes around time $t=2$,
+ while the half-density advection sheme maintains positivity and the regularity of the exact solution.
+Both schemes begin to fail once the exact solution becomes concentrated in a space below the chosen resolution of $2\pi \times 2^{-6}$.
 
-\hoj{Compare two low res computations.
-  One with transfer operators, the other with our method.}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.2\textwidth]{./images/half_density_sqr_t1_00.png}
+  \includegraphics[width=0.2\textwidth]{./images/half_density_sqr_t2_00.png}
+  \includegraphics[width=0.2\textwidth]{./images/transfer_op_t1_00.png}
+  \includegraphics[width=0.2\textwidth]{./images/transfer_op_t2_00.png}
+  \caption{Computed densities via our method and the transfer operator method with respect to the vector field $\dot{x} = \sin(2x)$ and with a uniform density at $t=0$.  The top two panels depict solutions computed with our scheme at time $t=1$ and $t=2$.   The bottom two panels depict the densities computed via transfer operator theory.  In each panel, the exact solution is plotted in black.}
+  \label{fig:one_dim_system}
+\end{figure}
 
 \section{Future work}
 
