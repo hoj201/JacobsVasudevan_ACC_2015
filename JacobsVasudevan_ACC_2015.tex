@@ -148,7 +148,7 @@
   Moreover, important entities such as the advected moments
   $\tilde{m}_i(t) = \int \tilde{\rho}(x,t) (\Phi_X^t)_*(f_i)dx$
   may fluctuate, also in contrast with the exact moments
-  $m_i = \int \rho(x,t)  (\Phi_X^t)_*(f_i) \dx$.
+  $m_i = \int \rho(x,t)  (\Phi_X^t)_*(f_i) dx$.
   When dealing with manifolds of even moderate dimensions
   (e.g. $d=3$) it is important for a method to behave well at finite $N$'s
   because it is infeasible to finely resolve along each dimension.
@@ -295,27 +295,21 @@
   With the Lie-derivative defined we can write the advection
   PDE for densities as
   \begin{align}
-    \partial_t \rho + \pounds_X[\rho] = 0 \label{eq:advection},
+    \partial_t \nu + \pounds_X[\nu] = 0 \label{eq:advection},
   \end{align}
-  for a time-dependent density $\rho(t) \in \Dens(M)$
+  for a time-dependent $\alpha$-density $\nu(t) \in \Dens^\alpha(M)$
   which is advected infinitesimally by the vector field 
   $X \in \mathfrak{X}(M)$.
-  In local coordinates, \eqref{eq:advection} is written the same
+  If $\alpha = 1$, \eqref{eq:advection} is written in local coordinates
   as \eqref{eq:Louiville}.
 
   Moreover, for a time-dependent half-density $\psi(t) \in \Dens^{1/2}(M)$
-  we may consider the advection equation
-  \begin{align}
-    \partial_t \psi + \pounds_X[\psi] = 0 \label{eq:advection2}
-  \end{align}
-  which is written in local coordinates as
+  equation \eqref{eq:advection} is written in local coordinates as
   \begin{align*}
     \partial_t \psi(x) 
     + X^i(x) \partial_i \psi(x) 
     + \frac{1}{2} (\partial_i X^i)(x) \psi(x) = 0.
   \end{align*}
-  \hoj{rewrite these two advection equations as one, with
-    an arbitrary $\alpha$}
   \begin{thm} \label{thm:advection}
     Let $\rho(t) \in \Dens(M)$ be a time-dependent probability density
     and let $\psi \in \Dens^{1/2}(M)$ be such that $\rho = \psi^2$.
@@ -323,12 +317,12 @@
     Let $X \in \mathfrak{X}(M)$.
     The following are equivalent:
     \begin{enumerate}
-      \item $\rho$ satisfies the advection equation \eqref{eq:advection}.
-      \item $\psi$ satisfies the advection equation \eqref{eq:advection2}.
+      \item $\rho$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1$.
+      \item $\psi$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1/2$.
     \end{enumerate}
   \end{thm}
   \begin{proof}
-    Let $\psi$ satisfy \eqref{eq:advection2}.
+    Let $\psi$ satisfy \eqref{eq:advection}.
     We find
     \begin{align*}
       \partial_t (\psi^2) &= 2 \partial_t\psi \cdot \psi
@@ -350,18 +344,18 @@
     Moreover, the right hand side is $2 (\partial_t \psi) \psi$.
     We can divide both side by $\psi$ at any point where $\psi(x) \neq 0$.
     By continuity of $\partial_t \rho$ and $\partial_t \psi$ we can
-    verify \eqref{eq:advection2} on the entire support of $\psi$
+    verify \eqref{eq:advection} on the entire support of $\psi$
     (which is also the support of $\rho$).
     Outside the support it is neccesarily the case that
     $\rho = 0$ and  $\partial_i \rho = 0$.
     We observe that $\pounds_X[\rho] = 0$ as well.
     In this case $\pounds_X[\psi] = 0$ by the same argument.
-    So we've verified \eqref{eq:advection2} on the entire domain.
+    So we've verified \eqref{eq:advection} on the entire domain.
   \end{proof}
 
   We will use theorem \ref{thm:advection} later to justify building
-  a numerical scheme to solve \eqref{eq:advection2} in lieu of solving 
-  \eqref{eq:advection}.
+  a numerical scheme to solve \eqref{eq:advection} with $\alpha = 1/2$
+  in lieu of solving \eqref{eq:advection} with $\alpha = 1$.
 
 \subsection{Euclidean realizations}
 \label{sec:euclidean}
