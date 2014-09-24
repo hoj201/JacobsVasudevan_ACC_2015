@@ -49,8 +49,9 @@
   on the positive cone of the unsigned densities.
   Existing schemes exhibit numerical artifacts such as
   ``negative probabilities'' and have restricted convergence results.
-  In this article we present a method whith a relatively strong
-  convergence result, which also preserves the sign of densities.
+  In this article we present a convergent method
+  which preserves the positivity of probability densities
+  at arbitrarily low resolutions.
   Moreover, we can use a single dense chart to transport the machinary of wavelet analysis to a manifolds.
   This allows us to avoid the use of transition maps between multiple charts, and to implement our method on a variety of non-Euclidean spaces at multiple length scales with existing wavelet algorithms designed on $\R^n$.
 \end{abstract}
@@ -58,19 +59,21 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-  The task of advecting a probability presents itself
+  The task of advecting a probability density presents itself
   in a variety of scenarios.
-  It is often the case that an engineer is presented
-  with a dynamical systems with incomplete knowledge
-  of the initial condition.
-  If there is some region, $S$,of state-space which is ``dangerous''
+  Engineers are often presented
+  with dynamical systems and incomplete knowledge
+  of the initial conditions.
+  If there is some region, $S$, of state-space which is ``dangerous''
   he or she may wish to compute the probability of landing
   in this dangerous region at time $T$.
-  If the initial condition is given by a probabilty density $p(\cdot \mid t=0)$
-  the probability of landing in the retion is $P( x \in S \mid t = T)  = \int_S p( dx | t=T )$ where $p(dx|t=T)$ is the advected probability density at time $T$.
-  In order to compute such quantities, one must compute $p(dx\mid t=T)$
-  using the initial condition $p(dx\mid t=0)$ and its
-  advection equation induced by the dynamics of the system.
+  If the initial condition is given in the form of a
+  probabilty density $p(\cdot \mid t=0)$
+  the probability of landing in $S$ at time $T$
+  is $P( x \in S \mid t = T)  = \int_S p( dx | t=T )$
+  where $p(dx|t=T)$ is the advected probability density at time $T$.
+  In order to compute $p(dx\mid t=T)$
+  one must advect $p(dx\mid t=0)$ under the flow of the dynamics.
 
 \subsection{Background material}
   Let $p_0$ be a probability density on $\R^n$
@@ -94,14 +97,14 @@
   \end{align}
   for all $x \in \R^n$.
   Equation \eqref{eq:Louiville} is known as the \emph{Louiville equation}.
-  Using \eqref{eq:push_forward} to compute $p$ is typically difficult
+  Using \eqref{eq:push_forward} to compute $p$ is difficult
   because $\Phi_X^t$ is typically a non-linear map with no closed
   form expression.
   To compute $p( x ; t)$, it is often easier
   to numerically solve \eqref{eq:Louiville}
   (a first order linear evolution PDE)
   with the initial condition $p_0$.
-  On a generic manifold $M$, the advection equation is a linear
+  On a manifold $M$, the advection equation is a linear
   evolution PDE involving the Lie-derivative
   where the description in a local coordinate chart is
   given by \eqref{eq:Louiville}.
@@ -109,14 +112,15 @@
 
 \subsection{A naive psuedo-spectral method}
 \label{sec:naive}
-  Let $f_0,f_1,f_2,\dots$ serve as an
-  orthonormal Hilbert basis
-  for $L_2(\R^n)$ (e.g. products of sinusoids).
+  In this section we will present the simplest type of
+  spectral discretization of \eqref{eq:Louiville}.
+  Let $f^0,f^1,f^2,\dots \in L^2(\R^n)$ serve as an
+  orthonormal Hilbert basis (e.g. a Fourier basis).
   Let $\rho(x,t)$ be the solution to \eqref{eq:Louiville}.
   Assuming $\rho(\cdot,t) \in L^2$ and $\partial_i X^i \in L^{\infty}$,
   we can define the scalars $\rho_j(t), A^k_j \in \R$
-  by $\rho_j(t) = \langle \rho_t( \cdot ) , f_j \rangle_{L^2}$
-  and $A^k_j = \langle (\partial_i X^i) f_j , f_k \rangle$.
+  by $\rho_j(t) = \langle \rho(\cdot ,t) , f^j \rangle_{L^2(\R^n)}$
+  and $A^k_j = \langle (\partial_i X^i) f^j , f^k \rangle_{L^2(\R^n)}$.
   Then $\rho_j(t)$ satisfies the infinite-dimensional linear
   ordinary differential equation
   $
@@ -126,20 +130,25 @@
   We can truncate this system at some finite $N \in \mathbb{N}$
   to obtain an $N$-dimensional linear ordinary differential equation
   $\dot{\rho}_{N,j} = -\sum_{k=0}^{N} A^k_j \rho_{N,j}$ for $j=0,\dots,N$.
-  It is notable that if $f_0,f_1,\dots$ is a Haar basis, then the matrix
-  $A^k_j$ is equivalent to a transfer operator.
+  It is notable that if $f_0,f_1,\dots$ is a Haar basis, then
+  at finite resolution, this algorithm is equivalent to 
+  partitioning the space into cells and the basis is equivalent
+  to a set of indicator functions on the cells.
+  The matrix $A^k_j$ is then simply a matrix of fluxes 
+  known as a transfer operator.
   Under the right circumstances,
-  this method converges as $N \to \infty$
+  this method converges as the cell width approaches $0$ and $N \to \infty$
   \cite{FroylandJungeKoltai2013}.
 
-  However, for $N < \infty$, there is no guarantee that the reconstructed
+  However, for finite $N$, there is no guarantee that the reconstructed
   density $\tilde{\rho}(x,t) = \sum_{j=0}^N \rho_{N,j}(t) f_j(x)$
   is non-negative.
   Generically $\tilde{\rho}(x,t)$ will take on both signs, in
   contrast with the exact solution $\rho(x,t)$ (see figure \ref{fig:one_dim_system})
-  Moreover, the total mass $\tilde{m}(t) = \int \tilde{\rho}(x,t)dx$
-  may fluctuate, also in contrast with the exact total mass
-  $m = \int \rho(x,t) dx$.
+  Moreover, important entities such as the advected moments
+  $\tilde{m}_i(t) = \int \tilde{\rho}(x,t) (\Phi_X^t)_*(f_i)dx$
+  may fluctuate, also in contrast with the exact moments
+  $m_i = \int \rho(x,t)  (\Phi_X^t)_*(f_i) \dx$.
   When dealing with manifolds of even moderate dimensions
   (e.g. $d=3$) it is important for a method to behave well at finite $N$'s
   because it is infeasible to finely resolve along each dimension.
@@ -167,7 +176,7 @@
   Hueristically, it is a map which
   takes an infinitesimal box (or volume element)
   on a manifold as input, and outputs the infinitesimal ``size''
-  of the box (a real number, possibly negative).
+  of the box (a real number).
   Therefore, in order to discuss densities,
   we must first mathematize the notion of an ``infinitesimal box.''
   This motivates our introduction of \emph{frames}.
@@ -197,12 +206,12 @@
   Now that we understand frames (i.e. infinitesimal boxes)
   sufficiently well, we may introduce the notion of \emph{densities}.
 
-  \begin{defn}[see Appendix A \cite{BatesWeinstein1997}]
+  \begin{defn}[Appendix A \cite{BatesWeinstein1997}]
     \label{eq:density}
     Let $\alpha > 0$.
     An $\alpha$-\emph{density} on a manifold, $M$, is a map
     $\rho:\Fr M \to \R$ such that
-    for any frame $e \in \Fr M$, and
+    for any frame $e \in \Fr M$ and $A \in \GL(n)$,
     $
       \rho( A \cdot e ) =  | \det(A) |^\alpha \rho(e).
     $
@@ -210,14 +219,14 @@
     A $1$-density is simply called a \emph{density}, and
     so we denote $\Dens^1(M)$ by $\Dens(M)$.
     The integral of a density is defined via the same construction as that
-    for $n$-forms \cite[\S 14]{Lee2006}.
+    for $n$-forms \cite[Ch. 14]{Lee2006}.
     A \emph{mass density} is a density which is non-negative.
     and it is called a \emph{probability density} if its integral is
     unity.
   \end{defn}
 
   One can observe immediately that $\Dens^\alpha(M)$ is a vector-space.
-  Despite this commomanilty with tensors,
+  Despite this commonality with tensors,
   $1$-densities are \emph{not} tensors.
   Densities are very close in spirit to $n$-forms,
   but unlike $n$-forms, densities are \emph{non-oriented}
@@ -305,7 +314,8 @@
     + X^i(x) \partial_i \psi(x) 
     + \frac{1}{2} (\partial_i X^i)(x) \psi(x) = 0.
   \end{align*}
-  
+  \hoj{rewrite these two advection equations as one, with
+    an arbitrary $\alpha$}
   \begin{thm} \label{thm:advection}
     Let $\rho(t) \in \Dens(M)$ be a time-dependent probability density
     and let $\psi \in \Dens^{1/2}(M)$ be such that $\rho = \psi^2$.
