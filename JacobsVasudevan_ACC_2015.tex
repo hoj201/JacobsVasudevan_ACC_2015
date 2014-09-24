@@ -355,163 +355,235 @@
 
 \subsection{Euclidean realizations}
 \label{sec:euclidean}
-  We would like to apply wavelet theory later for the purpose of the
-  error bounds and sparsity structure they will bring us.
-  However, the notion of wavelets on manifolds is still in development,
-  and virtually all of the available packages are for wavelets on
-  Euclidean spaces.
+  We would like to apply wavelet theory later for the
+  analysis and sparsity structure they provide.
+  However, the notion of wavelets on manifolds is still young,
+  and virtually all of the available wavelet analysis machinery
+  is developed on Euclidean spaces and Tori.
   In this section we will present theorems which allow
   us to transform analysis on manifolds into problems
   of analysis on subspaces of functions on $\R^n$.
-  For convenience we will use the non-standard convention
-  that charts map open sets in $\R^n$ into manifolds.
-  This is equivalent to replacing all charts in the standard
-  convection with their inverse maps.
 
-  The key to this section is the use of almost global charts
-  which may include coordinate singularities.
-  We find that if the coordinate singularities are given
-  proper attention, all the data on the original manifold
-  may be recovered on a Euclidean domain.
+\begin{thm}
+  \label{thm:Euclidean}
+  Let $\varphi:U \subset M \to V \subset \R^n$ be a chart.
+  As $\varphi$ is injective, we can invert it on the range $V$.
+  If $U$ is dense in $M$ then the maps
+  \begin{align*}
+    f \in C^k(M) &\mapsto \varphi_*f = f \circ \varphi^{-1} \in C^k(V) \\
+    \nu \in \Dens^\alpha(M) &\mapsto \varphi_* \nu = \nu \circ \Fr(\varphi^{-1}) \in \Dens^\alpha(V) \\
+    X \in \mathfrak{X}(M) &\mapsto \varphi_* X = T\varphi \cdot X \circ \varphi^{-1} \in \mathfrak{X}(V)
+  \end{align*}
+  are injective ring/vector-space/Lie-algebra morphisms respectively.
+  \end{thm}
+  \begin{proof}
+    Let $f,g \in C^k(M)$ be such that $\varphi_* f = \varphi_*g$.
+    Assume $f \neq g$.
+    Since the range of $\varphi^{-1}$ is $U$, it must be the case that
+    $f(x) \neq g(x)$ for some $x \notin U$.
+    As $U$ is dense in $M$ there is a sequence $x_0,x_1,\dots$ in $U$
+    which converges to $x$.
+    As $f$ and $g$ are continous $g(x_i) = f(x_i)$ must converge to a
+    unique limit.  Thus $g(x) = f(x)$, contradicting the assumption
+    that $f \neq g$.
+    Therefore the map $f \in C^k(M) \to \varphi_* f \in C^k(V)$
+    is injective.
+    That it is a ring morphism can then be viewed directly, $\varphi_*(f) \cdot \varphi_*(g) = \varphi_*(f \cdot g)$ for any $f,g \in C^k(M)$.
+    
+    The same argument applies to vector-fields
+    upon noting $\varphi_*(X+cY) = \varphi_*X + c \varphi_*Y$ for any $X,Y \in \mathfrak{X}(M)$ and $c \in \R$, and $\varphi_*([X,Y]) = [\varphi_*X, \varphi_*Y]$.
 
-\begin{thm} \label{thm:Euclidean}
-  Let $\varphi : V \subset \R^n \to U \subset M$ be a chart on 
-  a compact $C^k$-manifold $M$ such that $U$ is dense in $M$.
-  We can extend $\varphi$ to a surjective map
-  $\bar{\varphi}: \bar{V} \to M$ such that
-  $M$ is $C^k$-diffeomorphic to $\bar{V} / \bar{\varphi}$.
-\end{thm}
-\begin{proof}
-  Let $\{x_k\}$ we a sequence in $V$ which converges to the boundary
-  of $\bar{V}$, then $\varphi(x_k)$ converges to a unique point in
-  $M \backslash U$ because $M$ is compact and $\varphi$ is continous.
-  This extends $\varphi$ to the boundary of $\bar{V}$.
-
-  Observe that $\bar{\varphi}( \bar{V} ) = \bar{U} = M$.
-  By construction $\bar{\varphi}$ is injective on $\bar{V} / \bar{\varphi}$.
-  Thus $\bar{\varphi}$ is a bijection from $\bar{V} / \bar{\varphi}$ to $M$.
+    Finally, the same argument applies to $\alpha$-densities
+    upon noting $\varphi_*( \nu + c \mu) = \varphi_*\nu + c \varphi_* \mu$ for any $\nu,\mu \in \Dens^\alpha(M)$.
+  \end{proof}
   
-  We have shown equivalence as sets.
-  To obtain equivalence as topological spaces use
-  the quotient topology induced by $\bar{\varphi}$.
-  To obtain $C^k$-equivalence, use the quotient topology
-  induced by the $k$th order jet of $\varphi$
-  and continuously extend to $\bar{V}$.
-  \footnote{This entails interpreting the $k$th order Taylor expansions
-  of $\varphi$ as  a map to the space of multidimensional polynomials.
-  We then apply the same argument used to prove equivalence as topological
-  spaces to this map.}
-\end{proof}
+  \begin{cor}
+    Assume the setup of theorem \ref{thm:Euclidean}.
+    The map 
+    ``$\psi \in \Dens^{1/2}(M) \mapsto \varphi_* \psi \in \Dens^{1/2}(V)$''
+    is an isometry.
+  \end{cor}
+  \begin{proof}
+    Simply observe
+    \begin{align*}
+      \langle \varphi_*\psi_1 , \varphi_*\psi_2 \rangle
+      &= \int_V \varphi_*(\psi_1) \varphi_*(\psi_2) \\
+      &= \int_V \varphi_*( \psi_1 \cdot \psi_2) \\
+      &= \int_U \psi_1 \cdot \psi_2.
+    \end{align*}
+    As $U$ is dense in $M$, the above integral is unchanged by integration
+    over $M$.   Thus we've verified $\langle \varphi_* \psi_1,\varphi_*\psi_2 \rangle = \langle \psi_1,\psi_2 \rangle$.
+  \end{proof}
+
+  The upshot of theorem \ref{thm:Euclidean} is that we may represent PDEs on manifolds
+  as PDE's on Euclidean domains.
+  In particular, theorem \ref{thm:Euclidean} equates the function
+  space $C^k(M)$ with the subring
+  \begin{align*}
+    \varphi_*C^k(M) := \{ g \in C^k(V) \mid g = f \circ \varphi^{-1} , f \in C^k(M) \}.
+  \end{align*}
+  Thus any, PDE on $M$ can be fully represented as a PDE on a 
+  subring of functions on $V$.
+  
+
+% \begin{thm} \label{thm:Euclidean}
+%   Let $\varphi : V \subset \R^n \to U \subset M$ be a chart on 
+%   a compact $C^k$-manifold $M$ such that $U$ is dense in $M$.
+%   We can extend $\varphi$ to a surjective map
+%   $\bar{\varphi}: \bar{V} \to M$ such that
+%   $M$ is $C^k$-diffeomorphic to $\bar{V} / \bar{\varphi}$.
+% \end{thm}
+% \begin{proof}
+%   Let $\{x_k\}$ we a sequence in $V$ which converges to the boundary
+%   of $\bar{V}$, then $\varphi(x_k)$ converges to a unique point in
+%   $M \backslash U$ because $M$ is compact and $\varphi$ is continous.
+%   This extends $\varphi$ to the boundary of $\bar{V}$.
+
+%   Observe that $\bar{\varphi}( \bar{V} ) = \bar{U} = M$.
+%   By construction $\bar{\varphi}$ is injective on $\bar{V} / \bar{\varphi}$.
+%   Thus $\bar{\varphi}$ is a bijection from $\bar{V} / \bar{\varphi}$ to $M$.
+  
+%   We have shown equivalence as sets.
+%   To obtain equivalence as topological spaces use
+%   the quotient topology induced by $\bar{\varphi}$.
+%   To obtain $C^k$-equivalence, use the quotient topology
+%   induced by the $k$th order jet of $\varphi$
+%   and continuously extend to $\bar{V}$.
+%   \footnote{This entails interpreting the $k$th order Taylor expansions
+%   of $\varphi$ as  a map to the space of multidimensional polynomials.
+%   We then apply the same argument used to prove equivalence as topological
+%   spaces to this map.}
+% \end{proof}
 
   As an example consider the $2$-sphere, $S^2 \subset \R^3$.
   If we use spherical coordinates we obtain a map
   $\varphi: (-\pi,\pi) \times (0,\pi) \to U \subset S^2$
   given by
   \begin{align*}
-    \chi(\theta,\phi) = \begin{pmatrix}
-      \cos(\theta) \sin(\phi) \\
-      \sin(\theta) \sin(\phi) \\
-      \cos(\phi)
+    \chi(\phi,\theta) = \begin{pmatrix}
+      \cos(\phi) \sin(\theta) \\
+      \sin(\phi) \sin(\theta) \\
+      \cos(\theta)
       \end{pmatrix}.
   \end{align*}
-  The extension of $\varphi$ is the surjective map
-  $\bar{\varphi}:[-\pi,\pi] \times [0,\pi] \to S^2$ where 
-  $\bar{\varphi}(\theta, 0 ) = (0,0,1)$ and
-  $\bar{\varphi}(\theta, \pi) = (0,0,-1)$
-  for all $\theta \in (-\pi,\pi)$,
-  and $\bar{\varphi}(-\pi,\phi) = \bar{\varphi}( \pi,\phi)$
-  for any $\phi \in (0,\pi)$,
-  and $\bar{\varphi}(\theta,\phi) = \varphi(\theta,\phi)$
-  everywhere else.
-  Theorem \ref{thm:Euclidean} tells us that $S^2$ is diffeomorphic
-  to $[-\pi,\pi] \times [0,\pi]$ with the boundary points of the form
-  $(\theta,0)$ identified with each other, and the point $(-\pi,\phi)$
-  identified with $(\pi,\phi)$ for all $\phi \in (0,\pi)$.
+  Then we find
+  \begin{align*}
+    &\varphi_*C^0(S^2) = \{
+      f \in C^0( (-\pi,\pi)\times (0,\pi) \mid \\
+    &\quad \begin{array}{l}
+      \lim_{\theta \to 0} f(\phi,\theta) = f_{\rm north} \text{ for some } f_{\rm north} \in \R \\
+      \lim_{\theta \to \pi} f(\phi,\theta) = f_{\rm south} \text{ for some } f_{\rm south} \in \R 
+    \end{array}
+    \}
+  \end{align*}
+  The canonical volume form on $S^2$ viewed as a subset of $\R^3$ is 
+  given by
+  \begin{align*}
+    \mu_{S^2} = x dy \wedge dz - y dx \wedge dz + z dx \wedge dy.
+  \end{align*}
+  In spherical coordinates, this volume form is given by
+  \begin{align*}
+    \varphi_*(\mu_{S^2}) = \sin(\theta) d\theta \wedge d\phi.
+  \end{align*}
+  It is easy to observe that $|\mu_{S^2}|^\alpha \in \Dens^\alpha(M)$
+  and arbitrary $\nu \in \Dens^\alpha(M)$ can always be written
+  as $\nu = f_{\nu} \otimes |\mu_{S^2}|^\alpha$ for some function 
+  $f_\nu \in C^0(M)$.
+  The push-forward of $\nu$ by $\varphi$ is given by
+  $\varphi_*\nu = (\varphi_*f_\nu) \otimes (\varphi_*|\mu_{S^2}|^\alpha)$.
+  Therefore, by theorem \ref{thm:Euclidean},
+  the inner-product space of half densities $\Dens^{1/2}(S^2)$
+  is isometric to the subspace
+  \begin{align*}
+    \varphi_* \Dens^{1/2}(S^2) &= \{ \psi \in \Dens^{1/2}(V) \mid \\
+    & \quad \psi = f \otimes  (\sin(\theta) d\theta \wedge d\phi)^{1/2} ,\\
+    & \quad f \in \varphi_*C^0(S^2) \}.
+  \end{align*}
 
-  One concern is the assumption that there exists a chart which
-  is dense.  However, if $M$ is compact such a chart is guaranteed
-  to exist.
+  % One concern is the assumption that there exists a chart which
+  % is dense.  However, if $M$ is compact such a chart is guaranteed
+  % to exist.
 
-  \begin{prop}
-  If $M$ is compact then there exists a chart whose domain is dense in $M$.
-  \end{prop}
-  \begin{proof}
-  Without loss of generality we will assume that $M$ is connected.
-  If $M$ is not connected we may apply the following argument to each component.
-  Equip $M$ with a Riemannian structure.
-  We may then invoke Lemma 4.4 of \cite{Sakai1996}.
-  This completes the proof, but we can provide details for the sake of 
-  completeness (pun intended).
-  For any $p \in M$ we can define the cut-locus by $C_p$ and the maximal open set $U_p \subset T_p M$ over which $\exp_p : T_p M \to M$ is injective.
-  We see that $U = \exp_p(U_p)$ is dense in $M$.
-  Upon choosing a basis, ${\bf e}_1,\dots,{\bf e}_n \in T_xM$,
-   we obtain a chart $\varphi: V \subset \mathbb{R}^n \to U \subset M$.
-  Here $V$ is a star shaped subset of $\mathbb{R}^n$.
-  In particular, $\varphi(x) = \exp_p ( x^i {\bf e}_i )$.
-  \end{proof}
+  % \begin{prop}
+  % If $M$ is compact then there exists a chart whose domain is dense in $M$.
+  % \end{prop}
+  % \begin{proof}
+  % Without loss of generality we will assume that $M$ is connected.
+  % If $M$ is not connected we may apply the following argument to each component.
+  % Equip $M$ with a Riemannian structure.
+  % We may then invoke Lemma 4.4 of \cite{Sakai1996}.
+  % This completes the proof, but we can provide details for the sake of 
+  % completeness (pun intended).
+  % For any $p \in M$ we can define the cut-locus by $C_p$ and the maximal open set $U_p \subset T_p M$ over which $\exp_p : T_p M \to M$ is injective.
+  % We see that $U = \exp_p(U_p)$ is dense in $M$.
+  % Upon choosing a basis, ${\bf e}_1,\dots,{\bf e}_n \in T_xM$,
+  %  we obtain a chart $\varphi: V \subset \mathbb{R}^n \to U \subset M$.
+  % Here $V$ is a star shaped subset of $\mathbb{R}^n$.
+  % In particular, $\varphi(x) = \exp_p ( x^i {\bf e}_i )$.
+  % \end{proof}
 
-  The existence of such a chart in the non-compact case is unclear
-  at this time.  More importantly,
-  although the proof is constructive (via Riemannian exponential maps)
-  this construction is not practical.
-  Typically the Riemannian exponential and the cut-locus are difficult
-  to compute. Despite this limitation,
-  we will find that a fairly large variety of manifolds can be handled.
+  % The existence of such a chart in the non-compact case is unclear
+  % at this time.  More importantly,
+  % although the proof is constructive (via Riemannian exponential maps)
+  % this construction is not practical.
+  % Typically the Riemannian exponential and the cut-locus are difficult
+  % to compute. Despite this limitation,
+  % we will find that a fairly large variety of manifolds can be handled.
 
-  For us, the most important aspects are the following
-  \begin{cor}\label{prop:functions_spaces}
-    Let $M$ be a manifold with a dense chart 
-    $\varphi:V \subset \R^n \to U \subset M$.
-    The space $\Dens^\alpha(M)$ is isomorphic to the subspaces of 
-    $\Dens^\alpha(\bar{V})$ given by
-    \begin{align*}
-      \bar{\varphi}^*\Dens^\alpha(M) := \{ \nu \circ \Fr(\bar{\varphi})
-      \mid \nu \in \Dens^\alpha(M) \} \subset \Dens^\alpha( \bar{V}).
-    \end{align*}
-    The same construction yields $\mathfrak{X}(M)$ as isomorphic
-    to a subalgebra 
-    $\bar{\varphi}^* \mathfrak{X}(M) \subset \mathfrak{X}(\bar{V})$
-    and $C^k(M)$ as isomorphic to a subring
-    $\bar{\varphi}^* C^k(M) \subset C^k(\bar{V})$.
-  \end{cor}
-  \begin{proof}
-    Recall that $\bar{\varphi}$ is surjective, but not injective
-    on the boundary of $\bar{V}$.
-    Let $\nu \in \Dens^\alpha(M), x \in V, e \in \Fr_x V, A \in \GL(n)$.
-    We observe
-    \begin{align*}
-      \nu( A \cdot [ \Fr_x(\varphi) \cdot e ] ) =
-      | \det(A) |^{\alpha} \nu( \Fr_x(\varphi) \cdot e)
-    \end{align*}
-    so that $\nu \circ \Fr(\varphi) \in \Dens^\alpha(V)$.
-    By continous extension to $\bar{V}$ we find
-    $\nu \circ \Fr(\bar{\varphi}) \in \Dens^\alpha(\bar{V})$.
-    Let $\nu$ and $\mu$ be $\alpha$ densities,
-    and let them differ on $M\backslash U$.
-    Then $\mu$ and $\nu$ must also differ on $U$ 
-    because $U$ is dense and $\nu$ and $\mu$ are continous.
-    This would imply that $\varphi^*\nu$ and $\varphi^*\mu$ differ.
-    Therefore, the map
-    $\nu \in \Dens^\alpha(M) \mapsto \bar{\varphi}^*\nu \in \Dens^\alpha(\bar{V})$ is injective.
-    By inspection this map is linear, so that the range is
-    a subspace of $\Dens^\alpha(\bar{V})$.
+  % For us, the most important aspects are the following
+  % \begin{cor}\label{prop:functions_spaces}
+  %   Let $M$ be a manifold with a dense chart 
+  %   $\varphi:V \subset \R^n \to U \subset M$.
+  %   The space $\Dens^\alpha(M)$ is isomorphic to the subspaces of 
+  %   $\Dens^\alpha(\bar{V})$ given by
+  %   \begin{align*}
+  %     \bar{\varphi}^*\Dens^\alpha(M) := \{ \nu \circ \Fr(\bar{\varphi})
+  %     \mid \nu \in \Dens^\alpha(M) \} \subset \Dens^\alpha( \bar{V}).
+  %   \end{align*}
+  %   The same construction yields $\mathfrak{X}(M)$ as isomorphic
+  %   to a subalgebra 
+  %   $\bar{\varphi}^* \mathfrak{X}(M) \subset \mathfrak{X}(\bar{V})$
+  %   and $C^k(M)$ as isomorphic to a subring
+  %   $\bar{\varphi}^* C^k(M) \subset C^k(\bar{V})$.
+  % \end{cor}
+  % \begin{proof}
+  %   Recall that $\bar{\varphi}$ is surjective, but not injective
+  %   on the boundary of $\bar{V}$.
+  %   Let $\nu \in \Dens^\alpha(M), x \in V, e \in \Fr_x V, A \in \GL(n)$.
+  %   We observe
+  %   \begin{align*}
+  %     \nu( A \cdot [ \Fr_x(\varphi) \cdot e ] ) =
+  %     | \det(A) |^{\alpha} \nu( \Fr_x(\varphi) \cdot e)
+  %   \end{align*}
+  %   so that $\nu \circ \Fr(\varphi) \in \Dens^\alpha(V)$.
+  %   By continous extension to $\bar{V}$ we find
+  %   $\nu \circ \Fr(\bar{\varphi}) \in \Dens^\alpha(\bar{V})$.
+  %   Let $\nu$ and $\mu$ be $\alpha$ densities,
+  %   and let them differ on $M\backslash U$.
+  %   Then $\mu$ and $\nu$ must also differ on $U$ 
+  %   because $U$ is dense and $\nu$ and $\mu$ are continous.
+  %   This would imply that $\varphi^*\nu$ and $\varphi^*\mu$ differ.
+  %   Therefore, the map
+  %   $\nu \in \Dens^\alpha(M) \mapsto \bar{\varphi}^*\nu \in \Dens^\alpha(\bar{V})$ is injective.
+  %   By inspection this map is linear, so that the range is
+  %   a subspace of $\Dens^\alpha(\bar{V})$.
 
-    The same construction may be applied to vector-fields.
-    Let $X \in \mathfrak{X}(M)$.
-    We may restrict $X$ to $U$ and consider the pull-back
-    $\varphi^*(X|_U) := T\varphi^{-1} \cdot X|_U \circ \varphi \in \mathfrak{X}(V)$.
-    We may continously extend this to obtain a vector-field on $\bar{V}$.
-    \footnote{This is despite the fact that $\bar{\varphi}^{-1}$
-      does not exist.  We are merely using the fact that
-    $\varphi^*(X|_U)$ is continous on $V$.}
-    The same construction as before verifies injectivity.
-    Since all maps involved are Lie algebra morphisms, we obtain
-    a subalgebra of $\mathfrak{X}(\bar{V})$.
+  %   The same construction may be applied to vector-fields.
+  %   Let $X \in \mathfrak{X}(M)$.
+  %   We may restrict $X$ to $U$ and consider the pull-back
+  %   $\varphi^*(X|_U) := T\varphi^{-1} \cdot X|_U \circ \varphi \in \mathfrak{X}(V)$.
+  %   We may continously extend this to obtain a vector-field on $\bar{V}$.
+  %   \footnote{This is despite the fact that $\bar{\varphi}^{-1}$
+  %     does not exist.  We are merely using the fact that
+  %   $\varphi^*(X|_U)$ is continous on $V$.}
+  %   The same construction as before verifies injectivity.
+  %   Since all maps involved are Lie algebra morphisms, we obtain
+  %   a subalgebra of $\mathfrak{X}(\bar{V})$.
 
-    The same construction proves $C^k(M)$ is a subring of $C^k(\bar{V})$
-    via the ring morphism
-    $f \in C^k(M) \mapsto f \circ \bar{\varphi} \in C^k(\bar{V})$.
-  \end{proof}
+  %   The same construction proves $C^k(M)$ is a subring of $C^k(\bar{V})$
+  %   via the ring morphism
+  %   $f \in C^k(M) \mapsto f \circ \bar{\varphi} \in C^k(\bar{V})$.
+  % \end{proof}
 
 
 \section{An advection scheme}
