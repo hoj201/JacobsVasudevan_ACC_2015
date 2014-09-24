@@ -44,18 +44,35 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-  Consider the task of computing a probability density advected by an 
-  autonomous dynamical system.
-  Existing schemes exhibit numerical artifacts such as negative probability densities and fairly weak convergence results if any.
+  The task of computing a probability density advected by an 
+  dynamical system may be viewed as an inifinite dimensional problem
+  on the positive cone of the unsigned densities.
+  Existing schemes exhibit numerical artifacts such as
+  ``negative probabilities'' and have restricted convergence results.
   In this article we present a method whith a relatively strong
-  convergence result, which also preseves the sign of densities.
-  Moreover, we use dense charts to transport the machinary of wavelet analysis to manifolds.
-  This allows us to implement our method on a variety of non-Euclidean spaces at multiple length scales.
+  convergence result, which also preserves the sign of densities.
+  Moreover, we can use a single dense chart to transport the machinary of wavelet analysis to a manifolds.
+  This allows us to avoid the use of transition maps between multiple charts, and to implement our method on a variety of non-Euclidean spaces at multiple length scales with existing wavelet algorithms designed on $\R^n$.
 \end{abstract}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
+  The task of advecting a probability presents itself
+  in a variety of scenarios.
+  It is often the case that an engineer is presented
+  with a dynamical systems with incomplete knowledge
+  of the initial condition.
+  If there is some region, $S$,of state-space which is ``dangerous''
+  he or she may wish to compute the probability of landing
+  in this dangerous region at time $T$.
+  If the initial condition is given by a probabilty density $p(\cdot \mid t=0)$
+  the probability of landing in the retion is $P( x \in S \mid t = T)  = \int_S p( dx | t=T )$ where $p(dx|t=T)$ is the advected probability density at time $T$.
+  In order to compute such quantities, one must compute $p(dx\mid t=T)$
+  using the initial condition $p(dx\mid t=0)$ and its
+  advection equation induced by the dynamics of the system.
+
+\subsection{Background material}
   Let $p_0$ be a probability density on $\R^n$
   and let $X$ be a vector-field on $\R^n$.
   We denote the flow of $X$
@@ -84,12 +101,11 @@
   to numerically solve \eqref{eq:Louiville}
   (a first order linear evolution PDE)
   with the initial condition $p_0$.
-  
-  In this article we will study the advection of probability
-  densities on manifolds.
-  The corresponding advection equation is a linear
-  evolution PDE, whos description in local coordinates is 
+  On a generic manifold $M$, the advection equation is a linear
+  evolution PDE involving the Lie-derivative
+  where the description in a local coordinate chart is
   given by \eqref{eq:Louiville}.
+  This will be addressed in \S \ref{sec:math} (see \eqref{eq:advection}).
 
 \subsection{A naive psuedo-spectral method}
 \label{sec:naive}
@@ -120,12 +136,12 @@
   density $\tilde{\rho}(x,t) = \sum_{j=0}^N \rho_{N,j}(t) f_j(x)$
   is non-negative.
   Generically $\tilde{\rho}(x,t)$ will take on both signs, in
-  contrast with the exact solution $\rho(x,t)$.
+  contrast with the exact solution $\rho(x,t)$ (see figure \ref{fig:one_dim_system})
   Moreover, the total mass $\tilde{m}(t) = \int \tilde{\rho}(x,t)dx$
   may fluctuate, also in contrast with the exact total mass
   $m = \int \rho(x,t) dx$.
   When dealing with manifolds of even moderate dimensions
-  (e.g. $3$) it is important for a method to behave well at finite $N$'s
+  (e.g. $d=3$) it is important for a method to behave well at finite $N$'s
   because it is infeasible to finely resolve along each dimension.
 
 \subsection{Main contributions}
@@ -538,8 +554,16 @@
   \begin{align*}
     e = \| \psi(t) - \psi^{(j)}(t) \|_{L^2}.
   \end{align*}
-  This is the content of theorem \ref{thm:convergence}, to which
-  the next subsection is devoted.
+  This is the content of theorem \ref{thm:convergence}.
+
+\subsection{Properties}
+\label{sec:properties}
+Some propeties:  Positivity,
+Anti-symmetry (diagnolizable, easily exponentiated),
+mass conserving.
+
+\hoj{Still need to write this section}
+
 
 \subsection{Convergence}
 \label{sec:convergence}
@@ -697,13 +721,6 @@ We find
     That $|\psi_0|^2$ is a probability distribution means $\| \psi_0\|_{L^2} = 1$.
   \end{proof}
 
-\subsection{Properties}
-\label{sec:properties}
-Some propeties:  Positivity,
-Anti-symmetry (diagnolizable, easily exponentiated),
-mass conserving.
-
-\hoj{Still need to write this section}
 
 \section{Examples}
 \label{sec:Examples}
@@ -742,6 +759,9 @@ Both schemes begin to fail once the exact solution becomes concentrated in a spa
 \end{figure}
 
 \section{Future work}
+
+\hoj{Control systems.  Noise.  Manifolds with boundary.
+  Adaptivity, and decreased regularity.}
 
 \bibliographystyle{IEEEtran}
 \bibliography{/Users/hoj201/Dropbox/hoj_2014}
