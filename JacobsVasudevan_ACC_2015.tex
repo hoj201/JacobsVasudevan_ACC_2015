@@ -828,6 +828,53 @@ Both schemes begin to fail once the exact solution becomes concentrated in a spa
   \label{fig:one_dim_system}
 \end{figure}
 
+\subsection{The Van der Pol oscillator}
+Consider the system on $\R^2$ given by the ODE
+\begin{align}
+  \begin{split}
+    \dot{x} &= y \\
+    \dot{y} &= (1-x^2)y-x
+   \end{split} \label{eq:vdp}
+\end{align}
+The vector-field is depicted in figure \ref{fig:vdp_quiver}.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{./images/vdp_traj.png}
+  \caption{A quiver plot of the vector-field given by \eqref{eq:vdp}.  The trajectory with initial condition (1.5,0) is shown in blue.}
+  \label{fig:vdp_quiver}
+\end{figure}
+
+This vector field is particularly difficult for multiple reasons.
+Firstly, the system is on a noncompact domain, so we are unable to
+resolve the full domain using a finite set of basis functions.
+Secondly, if we restrict ourselve to a compact subset, the boundary conditions are non-vanishing.  Even worse, they are a mixture of inflowing
+and outflowing.
+Finally, the system exibits a limit cycle.
+As densities are attracted towards the limit cycle, they are 
+exponentially flattened.  Eventually the density will flatten 
+into a length scale below that which we've resolved.
+Despite these problems on the boundaries, and with the resolution,
+we are still able to construct a scheme which works on small times
+in regions near the origin.  A typical advection is shown in 
+figure \ref{fig:vdp_advection}.
+One can see the density begin to hug the side of the limit cycle
+at time $t=1$.
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.23\textwidth]{./images/vdp_t0p0.png}
+  \includegraphics[width=0.23\textwidth]{./images/vdp_t0p30.png}
+  \includegraphics[width=0.23\textwidth]{./images/vdp_t0p64.png}
+  \includegraphics[width=0.23\textwidth]{./images/vdp_t0p97.png}
+  \caption{Computed densities given a Gaussian initial condition
+    and advected by \eqref{eq:vdp}.
+    Snapshots are displayed at time $t=0.00,0.30,0.64,0.97$.
+  }
+  \label{fig:vdp_advection}
+\end{figure}
+
+
 \section{Conclusion}
 
 \hoj{Control systems.  Noise.  Manifolds with boundary.
