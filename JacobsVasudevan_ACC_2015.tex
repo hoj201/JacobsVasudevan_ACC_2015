@@ -928,6 +928,24 @@ We may approximate $C^0(V)$ using the Haar wavelet,
 and then push-forward these approximations
 to obtain an advection scheme on $S^2$.
 
+We simulate an initial density which consists of 
+a smooth bump function around the point $(-1,0,0)$.
+There is a saddle point at $(-1,0,0)$, and so 
+we should expect the distribution to tend towards
+a singular distribution concentrated along the unstable
+submanifold associated to the saddle point.
+The result is depicted in figure \ref{fig:sphere}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.24\textwidth]{./images/sphere_t0}
+  \includegraphics[width=0.24\textwidth]{./images/sphere_t2p5}
+  \includegraphics[width=0.24\textwidth]{./images/sphere_t5}
+  \includegraphics[width=0.24\textwidth]{./images/sphere_t7p5}
+  \caption{Snapshots at time $t=0.0,2.5,5.0,7.5$ of evolution on the 2-sphere, according to the rigid body equations.}
+  \label{fig:sphere}
+\end{figure}
+
 
 \section{Conclusion}
 
