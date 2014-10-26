@@ -3,6 +3,7 @@
 \usepackage{amsmath} % assumes amsmath package installed
 \usepackage{amssymb}  % assumes amsmath package installed
 \usepackage{todonotes}
+\usepackage[nomarkers,figuresonly]{endfloat}
 
 % NEW COMMANDS
 \newcommand{\hoj}[1]{\todo[inline,color=blue!20]{#1}}
@@ -43,8 +44,8 @@
   dynamical system may be viewed as an inifinite dimensional problem
   on the positive cone of the unsigned densities.
   Existing schemes exhibit numerical artifacts such as
-  ``negative probabilities'' and have restricted convergence results.
-  In this article we present a convergent method
+  ``negative probabilities''.
+  In this article we present a method
   which preserves the positivity of probability densities
   at arbitrarily low resolutions.
   Moreover, we can use a single dense chart to transport the machinary of wavelet analysis to a manifolds.
@@ -587,91 +588,113 @@
 
 \section{An advection scheme}
 \label{sec:scheme}
-  In this section we will consider an advection scheme
-  for half-densities in lieu of solving \eqref{eq:advection}.
-  Let $V \subset \mathbb{R}^d$ be an open set and let
-  $\{ \psi_\lambda \in L^2(V)  \mid \lambda \in \Lambda\}$
-  be a wavelet-basis for some
-  subspace of $L^2(V)$ consisting of $C^k$ functions for some
-  integer $k > \frac{d}{2} + 1$.
-  For each scale-space index $\lambda \in \Lambda$
-  we denote the resolution level by $|\lambda|$.\todo{resolution level?}
-  Let $E^j$ denote the span of the wavelet functions
-  associated to resolution $2^{-j}$ and let 
-  $\pr_{E^j}: L^2(V) \to E^j$ be the orthogonal projection.
-  Given a smooth vector-field $X \in \mathfrak{X}(V)$
-  we can define the operator $D_X : C^k(V) \to C^{k-1}(V)$ 
-  given by
-  \begin{align*}
-    D_X[f](x) &=  \sqrt{\rho}(x) \left(  X^i (x) \partial_if(x) 
-      + \frac{1}{2} {\rm div}_{\rho}(X) f(x) \right)\\
-    &= \sum_{ | m | \leq 1 } a^m(x) \partial_{m}f(x).
-  \end{align*}
-  Where ``$m$'' is a dummy multi-index and $\rho(x) > 0$ everywhere.
-  The advection equation \eqref{eq:advection2} is then written
-  as $\partial_t \psi + D_X[\psi] = 0$ by identifying the space
-  of $C^k$ half-densities with the space of $C^k$ functions.
+   In this section we will use Euclidean realizations of wavelet space
+   to implement the an advection scheme for densities on manifolds.
+   More specifically, we want to solve the evolution equation
+   \begin{align}
+     \partial_t \rho + \pounds_X[\rho] = 0 \quad , \quad 
+     \rho(0) = \rho_0 \in \Dens^1(M). \label{eq:density_advection2}
+   \end{align}
+   We are going to do this by first solving the half-density advection
+   equation
+   \begin{align}
+     \partial_t \psi + \pounds_X[\psi] = 0 \quad , \quad
+     \psi(0) = \psi_0 := \rho^{1/2} \in \Dens^{1/2}(M). \label{eq:half_density_advection}
+   \end{align}
+   If $\psi(t)$ is a solution to \eqref{eq:half_density_advection}
+   , then Theorem \ref{thm:advection} tells us that $\rho(t) := |\psi(t)|^2$
+   is a solution to our original problem \eqref{eq:density_advection2}.
+   Therefore we seek to solve \eqref{eq:half_density_advection}
+   in lieu of solving \eqref{eq:density_advection2}.
+   There are two reasons for doing this.
+   Firstly, since $\rho(t)$ will be obtained by squaring something,
+   it will neccessarily be positive.
+   Secondly, we may invoke the natural inner-product on $\Dens^{1/2}(M)$
+   to construct our advection scheme.
+   There is no need to introduce an non-canonical innerproduct, as is
+   typically the case in most spectral methods.
+   
+   The following is the algorithm we wish to consider in this paper.
+   Let $E_n = \{ f_0, \dots, f_n \}$ be set of half-densities on $M$
+   and let $\pr_n : \Dens^{1/2}(M) \to E_n$ be the orthogonal projection
+   with respect to the inner-product on half-densities.
+   For $X \in \mathfrak{X}(M)$, if we let $\pounds_X$ denote the Lie 
+   derivative on $\Dens^{1/2}(M)$ then we can consider the operator
+   \begin{align*}
+     [\pounds_X]_n = \pr_n \circ \left. \pounds_X \right|_{E_n} : 
+     E_n \to E_n
+   \end{align*}
+   as a finite-dimensional approximation of $\pounds_X$.
+   If this approximation is any good (e.g. convergent in some dense 
+   subspace of $\Dens^{1/2}(M)$), we may solve the finite dimensional
+   linear ODE
+   \begin{align*}
+     \dot{\psi}_n = [\pounds_X]_n \cdot \psi_n \quad , \quad
+     \psi_n(0) = \pr_n( \psi_0 ).
+   \end{align*}
+   Then $\psi(t) \approx \psi_n(t)$ for sufficiently large $n$,
+   and we have an approximate solution to \eqref{eq:half_density_advection},
+   and therefore an approximation to \eqref{eq:density_advection2}.
 
-  We could consider the operator on $E^j$ given by 
-  $D_X^{(j)} := \pr_{E^j} \circ \left. D_X \right|_{E^j}$
-  as a finite dimensional approximation of the Lie derivative of half-densities.
-  If this approximation is any good, then it might be reasonable to assume
-  the flow is continous, and approximate the evolution of $\psi$ by
-  \begin{align*}
-    \psi^{(j)}(t) = e^{t [X]^{(j)} } \cdot \psi_0 \in E^j \quad \forall t.
-  \end{align*}
-  If $\psi(t)$ is the solution to \eqref{eq:advection2},
-  we are curious to bound the error
-  \begin{align*}
-    e = \| \psi(t) - \psi^{(j)}(t) \|_{L^2}.
-  \end{align*}
-  This is the content of theorem \ref{thm:convergence}.
 
-\subsection{Properties}
-\label{sec:properties}
-Some propeties:  Positivity,
-Anti-symmetry (diagnolizable, easily exponentiated),
-mass conserving.
+%   If this approximation is any good, then it might be reasonable to assume
+%   the flow is continous, and approximate the evolution of $\psi$ by
+%   \begin{align*}
+%     \psi^{(j)}(t) = e^{t [X]^{(j)} } \cdot \psi_0 \in E^j \quad \forall t.
+%   \end{align*}
+%   If $\psi(t)$ is the solution to \eqref{eq:advection2},
+%   we are curious to bound the error
+%   \begin{align*}
+%     e = \| \psi(t) - \psi^{(j)}(t) \|_{L^2}.
+%   \end{align*}
+%   This is the content of theorem \ref{thm:convergence}.
 
-\hoj{Still need to write this section}
+% \subsection{Properties}
+% \label{sec:properties}
+% Some propeties:  Positivity,
+% Anti-symmetry (diagnolizable, easily exponentiated),
+% mass conserving.
+
+% \hoj{Still need to write this section}
 
 
-\subsection{Convergence}
-\label{sec:convergence}
+% \subsection{Convergence}
+% \label{sec:convergence}
 
-In this section we will use the following assumption
+% In this section we will use the following assumption
 
-\begin{ass}
-  Both $\psi_\lambda$ and $\tilde{\psi}_\mu$ have $C^{\alpha +1}$
-  smoothness and are orthogonal to polynomials of degree $n \geq \alpha -1$.
-\end{ass}
+% \begin{ass}
+%   Both $\psi_\lambda$ and $\tilde{\psi}_\mu$ have $C^{\alpha +1}$
+%   smoothness and are orthogonal to polynomials of degree $n \geq \alpha -1$.
+% \end{ass}
 
-We begin by bounding functions to their orthogonal
-projections in $E^j$.
+% We begin by bounding functions to their orthogonal
+% projections in $E^j$.
 
-\begin{lem}[see Theorem 3.10.2 or 3.2.2 of \cite{Cohen2003}]
-  \label{lem:polynomials}
-  Let $f \in H^n(V)$, and let $j \geq \frac{d}{2}$.
-  Then
-  \begin{align*}
-    \| f - {\rm Poly_j}(f) \|_{L^2} \leq 2^{-nj} \| f \|_{H^n}
-  \end{align*}
-  where ${\rm Poly}_j$
-  is the orthogonal projection of $L^2(V)$ onto polynomials
-  of degree $j$.
-\end{lem}
+% \begin{lem}[see Theorem 3.10.2 or 3.2.2 of \cite{Cohen2003}]
+%   \label{lem:polynomials}
+%   Let $f \in H^n(V)$, and let $j \geq \frac{d}{2}$.
+%   Then
+%   \begin{align*}
+%     \| f - {\rm Poly_j}(f) \|_{L^2} \leq 2^{-nj} \| f \|_{H^n}
+%   \end{align*}
+%   where ${\rm Poly}_j$
+%   is the orthogonal projection of $L^2(V)$ onto polynomials
+%   of degree $j$.
+% \end{lem}
 
-The following Lemma is equation 4.6.4 of \cite{Cohen2003}
-with ``$r=1$''.
+% The following Lemma is equation 4.6.4 of \cite{Cohen2003}
+% with ``$r=1$''.
 
-\begin{lem} \label{lem:entry_bounds}
-  Let $[X]_{\lambda\mu} := \langle \tilde{\psi}_\mu, D_X[\psi_\lambda] \rangle_{L^2}$.  Then
-  \begin{align*}
-    | [X]_{\lambda \mu} |\leq C 2^{- \left(\frac{(d+1)}{2}+ \alpha \right)| |\lambda| - |\mu| | }
-    2^{( |\lambda | + |\mu|)/2}.
-  \end{align*}
-  where $C > 0$ depends on $X$ through the $C^k$-norm of the coefficients $a^\alpha$.
-\end{lem}
+% \begin{lem} \label{lem:entry_bounds}
+%   Let $[X]_{\lambda\mu} := \langle \tilde{\psi}_\mu, D_X[\psi_\lambda] \rangle_{L^2}$.  Then
+%   \begin{align*}
+%     | [X]_{\lambda \mu} |\leq C 2^{- \left(\frac{(d+1)}{2}+ \alpha \right)| |\lambda| - |\mu| | }
+%     2^{( |\lambda | + |\mu|)/2}.
+%   \end{align*}
+%   where $C > 0$ depends on $X$ through the $C^k$-norm of the coefficients $a^\alpha$.
+% \end{lem}
+
 %   The following proof is taken from Example 1 in section 4.6 of \cite{Cohen2003}.
 % \begin{proof}
 %   By theorem 3.3.1 of \cite{Cohen2003} \todo{I don't really see how we are ausing Thm 3.3.1} and lemma \ref{lem:polynomials} we observe
@@ -689,108 +712,108 @@ with ``$r=1$''.
 %   and invoking the anti-symmetry of the operator $D_X$.
 % \end{proof}
 
-\begin{lem} \label{lem:DX_is_bounded}
-  $D_X$ is a bounded linear operator from $H^n(V)$ to $L^2(V)$.
-\end{lem}
-\begin{proof}
-  The coefficients $a^m$ are assumed smooth and bounded.
-  So that $D_X [f] = a^m \partial_m f \in H^{n-1} \subset L^2$.
-\end{proof}
+% \begin{lem} \label{lem:DX_is_bounded}
+%   $D_X$ is a bounded linear operator from $H^n(V)$ to $L^2(V)$.
+% \end{lem}
+% \begin{proof}
+%   The coefficients $a^m$ are assumed smooth and bounded.
+%   So that $D_X [f] = a^m \partial_m f \in H^{n-1} \subset L^2$.
+% \end{proof}
 
-\begin{lem}  \label{lem:L2_to_Hn}
-  Let $D_X^{(j)} := \pr_{E^j} \circ \left. D_X \right|_{E^j} : E^j \to E^j$.
-  There exists a $C>0$ such that for all $f \in H^s$
-  \begin{align}
-    \| (D_X - D_X^{(j)})[\pr_{E^j}(f)] \|_{L^2} \leq C 2^{-n(j+1)/2} \| f\|_{L^2}.
-  \end{align}
-\end{lem}
-\begin{proof}
-  Let $[D_X]_{\lambda\mu} = \langle \psi_{\mu} , D_X[\psi_\lambda] \rangle_{L^2}$
-and similarly for $[D_X^{(j)}]_{\lambda \mu}$.
-Note that if $|\lambda|>j$ or $|\mu |>j$ then $[D_X^{(j)}]_{\lambda\mu} = 0$.
-We find
-  \begin{align*}
-    &\| (D_X - D_X^{(j)}) [\pr_{E^j}(f))] \|^2_{L^2} = \\
-    &\quad \sum_{\lambda \in \Lambda, |\mu | \leq j} \left| [D_X]_{\lambda\mu} - [D_X^j]_{\lambda\mu} \right|^2 |[ \pr_{E^j}(f)]_\mu|^2 \\
-    &\quad = \sum_{|\mu|\leq j}| f_\mu |^2 \sum_{|\lambda| > j} | [D_X]_{\lambda\mu}|^2.
-  \end{align*}
-  By Lemma \ref{lem:entry_bounds} we see
-  \begin{align*}
-    &\leq C' \sum_{|\mu|\leq j} | f_\mu |^2  \sum_{|\lambda| > j } 
-    2^{- \left( \frac{d+1}{2} + \alpha \right) | |\lambda| - |\mu| |}
-    2^{ (|\lambda| + |\mu|)/2 }\\
-    &\leq \sum_{|\mu | \leq j , |\lambda| > j}
-    |f_\mu|^2 2^{ - \left( \frac{d}{2} + \alpha \right)|\lambda|} 
-    2^{|\mu|\left(\frac{d}{2} + 1 - \alpha\right) }
-  \end{align*}
-  The term $2^{|\mu|( d/2 + 1 - \alpha)}$ is bounded 
-  by $ 2^{j(d/2 + 1 - \alpha)}$,
-  Thus we find
-  \begin{align*}
-    &\leq C \|f\|_{L^2}^2 2^{j \left( \frac{d}{2} + 1 - \alpha\right)} \sum_{\lambda > j}
-      2^{-|\lambda|\left( \frac{d}{2} + \alpha\right)} \\
-    &\leq C' \|f\|_{L^2}^2 2^{j \left( \frac{d}{2} + 1 - \alpha\right)}
-    \frac{ 2^{ -\left(\frac{d}{2} + \alpha \right)}}{ 1 - 2^{-\left(\frac{d}{2} + \alpha\right)}} \\
-    &\leq C'' \|f\|_{L^2}^2 2^{-(j+1) \alpha}.
-  \end{align*}
-\end{proof}
-  \begin{cor} \label{cor:operator_bound}
-    \begin{align*}
-      &\| D_X [f] - D_X^{(j)} [\pr_{E^j}(f)] \|_{L^2} \leq \\
-      &\quad C \left( 2^{-nj} + 2^{-\alpha(j+1)/2} \right) \|f\|_{H^n}.
-    \end{align*}
-  \end{cor}
-  \begin{proof}
-    This follows directly from the inequality
-    \begin{align*}
-      &\| D_X [f] - D_X[\pr_{E^j}(f)] + D_X[\pr_{E^j}(f)] - D_X^{(j)}[\pr_{E^j}(f)] \|_{L^2} \\
-      &\quad \leq \|D_X\|_{L^2} \| f - \pr_{E^j}(f)\|_{L^2}
-      + \| (D_X - D_X^{(j)}) [\pr_{E^j}(f)] \|_{L^2}.
-    \end{align*}
-    and lemmas \ref{lem:DX_is_bounded} and \ref{lem:L2_to_Hn}.
-  \end{proof}
+% \begin{lem}  \label{lem:L2_to_Hn}
+%   Let $D_X^{(j)} := \pr_{E^j} \circ \left. D_X \right|_{E^j} : E^j \to E^j$.
+%   There exists a $C>0$ such that for all $f \in H^s$
+%   \begin{align}
+%     \| (D_X - D_X^{(j)})[\pr_{E^j}(f)] \|_{L^2} \leq C 2^{-n(j+1)/2} \| f\|_{L^2}.
+%   \end{align}
+% \end{lem}
+% \begin{proof}
+%   Let $[D_X]_{\lambda\mu} = \langle \psi_{\mu} , D_X[\psi_\lambda] \rangle_{L^2}$
+% and similarly for $[D_X^{(j)}]_{\lambda \mu}$.
+% Note that if $|\lambda|>j$ or $|\mu |>j$ then $[D_X^{(j)}]_{\lambda\mu} = 0$.
+% We find
+%   \begin{align*}
+%     &\| (D_X - D_X^{(j)}) [\pr_{E^j}(f))] \|^2_{L^2} = \\
+%     &\quad \sum_{\lambda \in \Lambda, |\mu | \leq j} \left| [D_X]_{\lambda\mu} - [D_X^j]_{\lambda\mu} \right|^2 |[ \pr_{E^j}(f)]_\mu|^2 \\
+%     &\quad = \sum_{|\mu|\leq j}| f_\mu |^2 \sum_{|\lambda| > j} | [D_X]_{\lambda\mu}|^2.
+%   \end{align*}
+%   By Lemma \ref{lem:entry_bounds} we see
+%   \begin{align*}
+%     &\leq C' \sum_{|\mu|\leq j} | f_\mu |^2  \sum_{|\lambda| > j } 
+%     2^{- \left( \frac{d+1}{2} + \alpha \right) | |\lambda| - |\mu| |}
+%     2^{ (|\lambda| + |\mu|)/2 }\\
+%     &\leq \sum_{|\mu | \leq j , |\lambda| > j}
+%     |f_\mu|^2 2^{ - \left( \frac{d}{2} + \alpha \right)|\lambda|} 
+%     2^{|\mu|\left(\frac{d}{2} + 1 - \alpha\right) }
+%   \end{align*}
+%   The term $2^{|\mu|( d/2 + 1 - \alpha)}$ is bounded 
+%   by $ 2^{j(d/2 + 1 - \alpha)}$,
+%   Thus we find
+%   \begin{align*}
+%     &\leq C \|f\|_{L^2}^2 2^{j \left( \frac{d}{2} + 1 - \alpha\right)} \sum_{\lambda > j}
+%       2^{-|\lambda|\left( \frac{d}{2} + \alpha\right)} \\
+%     &\leq C' \|f\|_{L^2}^2 2^{j \left( \frac{d}{2} + 1 - \alpha\right)}
+%     \frac{ 2^{ -\left(\frac{d}{2} + \alpha \right)}}{ 1 - 2^{-\left(\frac{d}{2} + \alpha\right)}} \\
+%     &\leq C'' \|f\|_{L^2}^2 2^{-(j+1) \alpha}.
+%   \end{align*}
+% \end{proof}
+%   \begin{cor} \label{cor:operator_bound}
+%     \begin{align*}
+%       &\| D_X [f] - D_X^{(j)} [\pr_{E^j}(f)] \|_{L^2} \leq \\
+%       &\quad C \left( 2^{-nj} + 2^{-\alpha(j+1)/2} \right) \|f\|_{H^n}.
+%     \end{align*}
+%   \end{cor}
+%   \begin{proof}
+%     This follows directly from the inequality
+%     \begin{align*}
+%       &\| D_X [f] - D_X[\pr_{E^j}(f)] + D_X[\pr_{E^j}(f)] - D_X^{(j)}[\pr_{E^j}(f)] \|_{L^2} \\
+%       &\quad \leq \|D_X\|_{L^2} \| f - \pr_{E^j}(f)\|_{L^2}
+%       + \| (D_X - D_X^{(j)}) [\pr_{E^j}(f)] \|_{L^2}.
+%     \end{align*}
+%     and lemmas \ref{lem:DX_is_bounded} and \ref{lem:L2_to_Hn}.
+%   \end{proof}
 
-  \begin{lem} \label{lem:flow_bound}
-    Let $A$ and $B$ be anti-Hermetian operators on a Hilbert space.
-    Let $x(t)$ satisfy $\dot{x} = Ax$ and $y(t)$ satisfy $\dot{y} = By$.
-    If $x(0) = y(0)$ and $\| A - B \| < \epsilon$, then $u(t) = \| x(t) - y(t) \|$ satisfies $u(t) < \epsilon t \| y(0) \|$
-  \end{lem}
+%   \begin{lem} \label{lem:flow_bound}
+%     Let $A$ and $B$ be anti-Hermetian operators on a Hilbert space.
+%     Let $x(t)$ satisfy $\dot{x} = Ax$ and $y(t)$ satisfy $\dot{y} = By$.
+%     If $x(0) = y(0)$ and $\| A - B \| < \epsilon$, then $u(t) = \| x(t) - y(t) \|$ satisfies $u(t) < \epsilon t \| y(0) \|$
+%   \end{lem}
  
-  \begin{proof}
-    Note that $\langle Ax,x\rangle = \langle By,y \rangle = 0$.
-    Using this we calculate
-    \begin{align*}
-      \frac{du}{dt} &= \frac{1}{2u(t)} \langle
-      Ax(t) - By(t) , x(t) - y(t) \rangle \\
-      &= \frac{1}{2u(t)} \langle
-      (A-B)y(t) , x(t) - y(t) \rangle \\
-      &\leq \frac{1}{2u(t)} \| A-B\|  \|y(t)\|  \|x(t) - y(t) \| \\
-      &< \epsilon \|y(t) \|
-    \end{align*}
-    However $\| y(t) \| = \| y(0) \|$ since $B$ is anti-Hermetian.
-    Thus $\frac{du}{dt} < \epsilon \| y(0) \|$.
-    The result follows by integration.
-  \end{proof}
-  The upshot of Lemma \ref{lem:flow_bound} is that we can bound the
-  operator $D_X$ to $D_X^{(j)}$ when restricted to $H^n$.
-  \begin{thm}\label{thm:convergence}
-    Let $\psi_0 \in L^2(V)$ be such that $|\psi_0|^2$ is a probability distribution.
-    Then the flows of $\dot{\psi} = D_X[\psi]$ and $\dot{\psi}^{(j)} = D_X^{(j)}[\psi^{(j)}]$ with initial condition $\psi_0$
-    satisfies
-    \begin{align*}
-      &\| \psi(t) - \psi^{(j)}(t) \|_{L^2}  \\
-      &\quad\leq t( 2^{-nj} + 2^{-n(j+1)/2}) \| \psi_0\|_{H^n} .
-    \end{align*}
-  \end{thm}
-  \begin{proof}
-    Combining corollary \ref{cor:operator_bound} with lemma \ref{lem:flow_bound}
-    yields
-    \begin{align*}
-      &\| \psi(t) - \psi^{(j)}(t) \|_{L^2}  \\
-      &\quad\leq t( 2^{-nj} + 2^{-n(j+1)/2}) \| \psi_0 \|_{H^n} \| \psi_0 \|_{L^2}.
-    \end{align*}
-    That $|\psi_0|^2$ is a probability distribution means $\| \psi_0\|_{L^2} = 1$.
-  \end{proof}
+%   \begin{proof}
+%     Note that $\langle Ax,x\rangle = \langle By,y \rangle = 0$.
+%     Using this we calculate
+%     \begin{align*}
+%       \frac{du}{dt} &= \frac{1}{2u(t)} \langle
+%       Ax(t) - By(t) , x(t) - y(t) \rangle \\
+%       &= \frac{1}{2u(t)} \langle
+%       (A-B)y(t) , x(t) - y(t) \rangle \\
+%       &\leq \frac{1}{2u(t)} \| A-B\|  \|y(t)\|  \|x(t) - y(t) \| \\
+%       &< \epsilon \|y(t) \|
+%     \end{align*}
+%     However $\| y(t) \| = \| y(0) \|$ since $B$ is anti-Hermetian.
+%     Thus $\frac{du}{dt} < \epsilon \| y(0) \|$.
+%     The result follows by integration.
+%   \end{proof}
+%   The upshot of Lemma \ref{lem:flow_bound} is that we can bound the
+%   operator $D_X$ to $D_X^{(j)}$ when restricted to $H^n$.
+%   \begin{thm}\label{thm:convergence}
+%     Let $\psi_0 \in L^2(V)$ be such that $|\psi_0|^2$ is a probability distribution.
+%     Then the flows of $\dot{\psi} = D_X[\psi]$ and $\dot{\psi}^{(j)} = D_X^{(j)}[\psi^{(j)}]$ with initial condition $\psi_0$
+%     satisfies
+%     \begin{align*}
+%       &\| \psi(t) - \psi^{(j)}(t) \|_{L^2}  \\
+%       &\quad\leq t( 2^{-nj} + 2^{-n(j+1)/2}) \| \psi_0\|_{H^n} .
+%     \end{align*}
+%   \end{thm}
+%   \begin{proof}
+%     Combining corollary \ref{cor:operator_bound} with lemma \ref{lem:flow_bound}
+%     yields
+%     \begin{align*}
+%       &\| \psi(t) - \psi^{(j)}(t) \|_{L^2}  \\
+%       &\quad\leq t( 2^{-nj} + 2^{-n(j+1)/2}) \| \psi_0 \|_{H^n} \| \psi_0 \|_{L^2}.
+%     \end{align*}
+%     That $|\psi_0|^2$ is a probability distribution means $\| \psi_0\|_{L^2} = 1$.
+%   \end{proof}
 
 
 \section{Examples}
@@ -801,13 +824,13 @@ Consider the ODE $X(x) = \sin(2x) \partial_x$ on the unit circle, $S^1$.
 We can solve for the flow in closed from.  We find
 $\Phi_X^t(x) = \arctan( e^{2t} \tan(x) )$.
 Using \eqref{eq:push_forward}
-we obtain the solution to \eqref{eq:advection} with initial condition $p_0(x)$ as the time-dependent density
+we obtain the solution to \eqref{eq:density_advection2} with initial condition $p_0(x)$ as the time-dependent density
 \begin{align*}
   &p(x,t) = \\
   &\quad p_0\left[ \arctan \left( \frac{ \tan(x)}{e^{2t}} \right)\right]
   \left( e^{-2t} \cos^2(x) + e^{2t} \sin^2(x) \right).
 \end{align*}
-Similarly, the solution to \eqref{eq:advection2} with the initial condition $\psi_0(x)$ is the time-dependent half-density
+Similarly, the solution to \eqref{eq:half_density_advection} with the initial condition $\psi_0(x)$ is the time-dependent half-density
 \begin{align*}
   &\psi(x,t) = \\
   &\quad \psi_0\left[\arctan\left( \frac{ \tan(x)}{e^{2t}} \right) \right]
@@ -936,7 +959,7 @@ a singular distribution concentrated along the unstable
 submanifold associated to the saddle point.
 The result is depicted in figure \ref{fig:sphere}
 
-\begin{figure}[h]
+\begin{figure}[p]
   \centering
   \includegraphics[width=0.24\textwidth]{./images/sphere_t0}
   \includegraphics[width=0.24\textwidth]{./images/sphere_t2p5}
@@ -946,16 +969,27 @@ The result is depicted in figure \ref{fig:sphere}
   \label{fig:sphere}
 \end{figure}
 
+\section{Conclusion and future work}
+In this article we have presented a spectral advection scheme which preserves the positivity of probability densities at arbitrarily low resolutions.
+However, there are two major items which will constitute future work
+for clarifying the range of applicability of this scheme.
+Firstly, we have not shown under which circumstance the scheme is
+ convergent.
+It may be intuitively clear that this scheme will converge
+under a ``reasonable'' choice of basis, but this is not precise.
+Future work entails clarifying what ``reasonable'' means.
+Secondly, the scheme appears to conserve a number of other
+properties at arbitrarily low resolutions.
+For example, the space of functions is discretized as
+a ring of Hermetian operators.
+This ring structure is preserved under our scheme.
+Enumerating the many other structures which are preserved 
+by the scheme will be elucidated in future work as well.
 
-\section{Conclusion}
-
-\hoj{Control systems.  Noise.  Manifolds with boundary.
-  Adaptivity, and decreased regularity.}
 
 \subsection{Acknowledgements}
-Erica Kim (matlab + graphics help).
-Richard Montgomery via Math Overflow (dense chart question).
-Darryl Holm (applications to imaging)
+H.O.J. is supported by European Research Council Advanced Grant 267382 FCCA.
+
 
 \bibliographystyle{IEEEtran}
 \bibliography{./hoj_2014}
