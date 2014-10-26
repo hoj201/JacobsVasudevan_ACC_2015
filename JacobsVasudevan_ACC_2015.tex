@@ -70,6 +70,18 @@
   where $p(dx|t=T)$ is the advected probability density at time $T$.
   In order to compute $p(dx\mid t=T)$
   one must advect $p(dx\mid t=0)$ under the flow of the dynamics.
+  
+  Computing $p(dx \mid t=T)$ is expensive, as in the solution of any
+  functional evolution equation.
+  This cost is exponentially exacerbated by the curse of dimensionality.
+  Roughly speaking, we run into data storage problems if we try to resolve
+  our numerical mesh.
+  Thus we seek an algorithm which has good behavior at moderate resolutions.
+  In this paper we will present an algorithm which preserves the positivity
+  of the space of probability densities at arbitrary resolutions.
+
+  \todo[inline]{It preserves so much more, but this is sort of a can of worms if all we want is a fast ArXiV paper at this point.  In particular, it
+  preserves a discretized notion of ``moments''}.
 
 \subsection{Background material}
   Let $p_0$ be a probability density on $\R^n$
@@ -190,10 +202,10 @@
   \end{prop}
 
   \begin{proof}
-    Let $e = \{ e^1,\dots,e^n \} \in \Fr_x M$ for some $x \in M$.
+    Let $e = \{ e_1,\dots,e_n \} \in \Fr_x M$ for some $x \in M$.
     For each $A \in \GL(n)$ define the left action
     \begin{align*}
-      A \cdot (e^1,\dots,e^n) := (A^j_1 e^j , \dots, A_n^j e^j ). 
+      A \cdot (e_1,\dots,e_n) := (A^j_1 e_j , \dots, A_n^j e_j ). 
     \end{align*}
     By inspection this actions is free and transitive.
     \footnote{This makes $\Fr M$ a $\GL(n)$ principal bundle over $M$.}
@@ -256,14 +268,15 @@
   Note that for any $C^1$ diffeomorphism $\Phi:M \to M$,
   there is a map $\Fr(\Phi) : \Fr M \to \Fr M$
   given by 
-  ``$(e^1,\dots,e^n) \mapsto (T\varphi \cdot e^1, \dots, T\varphi \cdot e^n)$''.
+  ``$(e_1,\dots,e_n) \mapsto (T\varphi \cdot e_1, \dots, T\varphi \cdot e_n)$''.
   This defines the \emph{pull-back} of an $\alpha$-density
   $\nu \in \Dens^\alpha(N)$
   by $\Phi^* \nu := \nu \circ \Fr(\Phi) \in \Dens^\alpha(M)$.
   \begin{prop} \label{prop:isom}
     Let $\Phi \in \Diff(M)$.
     The transformation ``$\psi \mapsto \Phi^* \psi$'' for
-    $\psi \in \Dens^{1/2}(M)$ is an isometry.
+    $\psi \in \Dens^{1/2}(M)$ is an isometry with respect
+    to the inner product on $\Dens^{1/2}(M)$.
   \end{prop}
   \begin{proof}
     Let $\psi_1,\psi_2 \in \Dens^{1/2}(M)$ and observe
@@ -298,14 +311,15 @@
   $X \in \mathfrak{X}(M)$.
   If $\alpha = 1$, \eqref{eq:advection} is written in local coordinates
   as \eqref{eq:Louiville}.
-
-  Moreover, for a time-dependent half-density $\psi(t) \in \Dens^{1/2}(M)$
-  equation \eqref{eq:advection} is written in local coordinates as
+  If $\nu(t) = \psi(t) \in \Dens^{1/2}(M)$ is a half-density, then
+  \eqref{eq:advection} is written in local coordinates as
   \begin{align*}
     \partial_t \psi(x) 
-    + X^i(x) \partial_i \psi(x) 
-    + \frac{1}{2} (\partial_i X^i)(x) \psi(x) = 0.
+    + \frac{1}{2} X^i(x) \partial_i \psi(x) 
+    + \frac{1}{2} \partial_i (\psi \cdot X^i)(x) \psi(x) = 0.
   \end{align*}
+  Note that this equation appears to be the average of the advection equation for densities ($\Dens^1(M)$) and the advection equation for functions ($\Dens^0(M)$).
+
   \begin{thm} \label{thm:advection}
     Let $\rho(t) \in \Dens(M)$ be a time-dependent probability density
     and let $\psi \in \Dens^{1/2}(M)$ be such that $\rho = \psi^2$.
@@ -356,10 +370,10 @@
 \subsection{Euclidean realizations}
 \label{sec:euclidean}
   We would like to apply wavelet theory later for the
-  analysis and sparsity structure they provide.
+  analytical tools and sparsity structure they carry.
   However, the notion of wavelets on manifolds is still young,
   and virtually all of the available wavelet analysis machinery
-  is developed on Euclidean spaces and Tori.
+  is developed on Euclidean spaces and tori.
   In this section we will present theorems which allow
   us to transform analysis on manifolds into problems
   of analysis on subspaces of functions on $\R^n$.
@@ -407,9 +421,9 @@
     Simply observe
     \begin{align*}
       \langle \varphi_*\psi_1 , \varphi_*\psi_2 \rangle
-      &= \int_V \varphi_*(\psi_1) \varphi_*(\psi_2) \\
-      &= \int_V \varphi_*( \psi_1 \cdot \psi_2) \\
-      &= \int_U \psi_1 \cdot \psi_2.
+      = \int_V \varphi_*(\psi_1) \varphi_*(\psi_2) 
+      = \int_V \varphi_*( \psi_1 \cdot \psi_2) 
+      = \int_U \psi_1 \cdot \psi_2.
     \end{align*}
     As $U$ is dense in $M$, the above integral is unchanged by integration
     over $M$.   Thus we've verified $\langle \varphi_* \psi_1,\varphi_*\psi_2 \rangle = \langle \psi_1,\psi_2 \rangle$.
@@ -420,11 +434,18 @@
   In particular, theorem \ref{thm:Euclidean} equates the function
   space $C^k(M)$ with the subring
   \begin{align*}
-    \varphi_*C^k(M) := \{ g \in C^k(V) \mid g = f \circ \varphi^{-1} , f \in C^k(M) \}.
+    \varphi_*C^k(M) := \{ g \in C^k(V) \mid g = f \circ \varphi^{-1} , f \in C^k(M) \} \subset C^k(V).
   \end{align*}
   Thus any, PDE on $M$ can be fully represented as a PDE on a 
   subring of functions on $V$.
-  
+  This is useful for solving the PDE under concern because it allows
+  us to implement wavelet analysis on manifolds.
+  Specifically, given our PDE on $\Dens^{1/2}(M)$,
+  we may invoke the above isometry to get a PDE
+  on the space $\Dens^{1/2}(V) \equiv L^2(V)$.
+  We can then solve this PDE on $L^2(V)$ in a wavelet
+  basis.  This will give us time dependent 
+  function which we can pull-back to $M$.
 
 % \begin{thm} \label{thm:Euclidean}
 %   Let $\varphi : V \subset \R^n \to U \subset M$ be a chart on 
@@ -454,8 +475,8 @@
 %   We then apply the same argument used to prove equivalence as topological
 %   spaces to this map.}
 % \end{proof}
-
-  As an example consider the $2$-sphere, $S^2 \subset \R^3$.
+  \subsection{Example: A Eucldean realization of $S^2$}
+  Consider the $2$-sphere, $S^2 \subset \R^3$.
   If we use spherical coordinates we obtain a map
   $\varphi: (-\pi,\pi) \times (0,\pi) \to U \subset S^2$
   given by
@@ -611,8 +632,8 @@
    it will neccessarily be positive.
    Secondly, we may invoke the natural inner-product on $\Dens^{1/2}(M)$
    to construct our advection scheme.
-   There is no need to introduce an non-canonical innerproduct, as is
-   typically the case in most spectral methods.
+   There is no need to introduce a non-canonical innerproduct, as is
+   the case in many spectral methods.
    
    The following is the algorithm we wish to consider in this paper.
    Let $E_n = \{ f_0, \dots, f_n \}$ be set of half-densities on $M$
@@ -625,12 +646,13 @@
      E_n \to E_n
    \end{align*}
    as a finite-dimensional approximation of $\pounds_X$.
-   If this approximation is any good (e.g. convergent in some dense 
-   subspace of $\Dens^{1/2}(M)$), we may solve the finite dimensional
+   If this approximation is any good
+   (i.e. convergent as $n \to \infty$ a dense subspace of $\Dens^{1/2}(M)$)
+   , we may solve the finite dimensional
    linear ODE
    \begin{align*}
      \dot{\psi}_n = [\pounds_X]_n \cdot \psi_n \quad , \quad
-     \psi_n(0) = \pr_n( \psi_0 ).
+     \psi_n(0) = \pr_n( \psi_0 ) \in E_n.
    \end{align*}
    Then $\psi(t) \approx \psi_n(t)$ for sufficiently large $n$,
    and we have an approximate solution to \eqref{eq:half_density_advection},
