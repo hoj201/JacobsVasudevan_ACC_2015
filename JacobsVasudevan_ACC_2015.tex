@@ -850,13 +850,13 @@ we obtain the solution to \eqref{eq:density_advection2} with initial condition $
 \begin{align*}
   &p(x,t) = \\
   &\quad p_0\left[ \arctan \left( \frac{ \tan(x)}{e^{2t}} \right)\right]
-  \left( e^{-2t} \cos^2(x) + e^{2t} \sin^2(x) \right).
+  \left( e^{2t} \cos^2(x) + e^{-2t} \sin^2(x)  \right)^{-1}.
 \end{align*}
 Similarly, the solution to \eqref{eq:half_density_advection} with the initial condition $\psi_0(x)$ is the time-dependent half-density
 \begin{align*}
   &\psi(x,t) = \\
   &\quad \psi_0\left[\arctan\left( \frac{ \tan(x)}{e^{2t}} \right) \right]
-  \left( e^{-2t} \cos^2(x) + e^{2t} \sin^2(x) \right)^{1/2}. 
+  \left( e^{2t} \cos^2(x) + e^{-2t} \sin^2(x) \right)^{-1/2}. 
 \end{align*}
 We can use the Haar-wavelet to implement the method mentioned in \S \ref{sec:naive}.  This equivalent to partitioning the space into cells and computing fluxes \cite{FroylandJungeKoltai2013}.  We can implement our own method with respect to the Haar wavelet as well (i.e. \S \ref{sec:scheme}).  Snapshots are shown in figure \ref{fig:one_dim_system}.
 Both schemes appear accurate at time $t=1$ and earlier.
