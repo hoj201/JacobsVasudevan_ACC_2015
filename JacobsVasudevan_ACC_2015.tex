@@ -842,7 +842,7 @@
 \label{sec:Examples}
 
 \subsection{Benchmark comparison with the Transfer-operator approach}
-Consider the ODE $X(x) = \sin(2x) \partial_x$ on the unit circle, $S^1$.
+Consider the ODE $X(x) = \sin(2x) \partial_x$ on the unit circle, $S^1$.\todo{This vector field does not match the numerics or the provided solution.  You probably meant to write $X(x) = \cos(2x) \partial_x$}
 We can solve for the flow in closed from.  We find
 $\Phi_X^t(x) = \arctan( e^{2t} \tan(x) )$.
 Using \eqref{eq:push_forward}
@@ -930,7 +930,7 @@ In the absence of external forces
 the equations of motion for the angular momentum, $\Pi \in \R^3$,
 of a rigid body are
 \begin{align}
-  \dot{Pi} = \Pi \times ( \mathbb{I}^{-1}\cdot \Pi),  \label{eq:rigid_body}
+  \dot{\Pi} = \Pi \times ( \mathbb{I}^{-1}\cdot \Pi),  \label{eq:rigid_body}
 \end{align}
 where $\mathbb{I} = {\rm diag}(I_1,I_2,I_3)$,
 and $I_1,I_2,I_3 > 0$ are rotational inertias along
