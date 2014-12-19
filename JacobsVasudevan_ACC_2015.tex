@@ -25,6 +25,7 @@
 \DeclareMathOperator{\GL}{GL}
 \DeclareMathOperator{\Dens}{Dens}
 \DeclareMathOperator{\pr}{pr}
+\DeclareMathOperator{\arccot}{arccot}
 
 \title{
   A 
@@ -842,20 +843,20 @@
 \label{sec:Examples}
 
 \subsection{Benchmark comparison with the Transfer-operator approach}
-Consider the ODE $X(x) = \sin(2x) \partial_x$ on the unit circle, $S^1$.\todo{This vector field does not match the numerics or the provided solution.  You probably meant to write $X(x) = \cos(2x) \partial_x$}
+Consider the ODE $X(x) = \sin(2x) \partial_x$ on the unit circle, $S^1$.
 We can solve for the flow in closed from.  We find
-$\Phi_X^t(x) = \arctan( e^{2t} \tan(x) )$.
+$\Phi_X^t(x) = \arccot( e^{-2t} \cot(x) )$.
 Using \eqref{eq:push_forward}
 we obtain the solution to \eqref{eq:density_advection2} with initial condition $p_0(x)$ as the time-dependent density
 \begin{align*}
   &p(x,t) = \\
-  &\quad p_0\left[ \arctan \left( \frac{ \tan(x)}{e^{2t}} \right)\right]
+  &\quad p_0\left[ \arccot \left( \cot(x)e^{-2t} \right)\right]
   \left( e^{2t} \cos^2(x) + e^{-2t} \sin^2(x)  \right)^{-1}.
 \end{align*}
 Similarly, the solution to \eqref{eq:half_density_advection} with the initial condition $\psi_0(x)$ is the time-dependent half-density
 \begin{align*}
   &\psi(x,t) = \\
-  &\quad \psi_0\left[\arctan\left( \frac{ \tan(x)}{e^{2t}} \right) \right]
+  &\quad \psi_0\left[\arccot\left( \cot(x)e^{-2t} \right) \right]
   \left( e^{2t} \cos^2(x) + e^{-2t} \sin^2(x) \right)^{-1/2}. 
 \end{align*}
 We can use the Haar-wavelet to implement the method mentioned in \S \ref{sec:naive}.  This equivalent to partitioning the space into cells and computing fluxes \cite{FroylandJungeKoltai2013}.  We can implement our own method with respect to the Haar wavelet as well (i.e. \S \ref{sec:scheme}).  Snapshots are shown in figure \ref{fig:one_dim_system}.
