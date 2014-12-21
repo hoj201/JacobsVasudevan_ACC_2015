@@ -865,6 +865,8 @@ However, the transfer operator method exhibits spurious oscillations and sign ch
  while the half-density advection sheme maintains positivity and the regularity of the exact solution.
 Both schemes begin to fail once the exact solution becomes concentrated in a space below the chosen resolution of $2\pi \times 2^{-6}$.
 
+We can also implement our own method using any wavelet. Snapshots of our method using two different Daubehcies wavelets (the Daubechies 4 and 6 wavelets) each at two different scales are illustrated in figure \ref{fig:one_dim_system_wavelet}. Notice that although four alternatives appear accurate at the two time instances depicted, the Daubechies 6 wavelet appears to perform at both scales. 
+
 \begin{figure}[p]
   \centering
   \includegraphics[width=0.43\textwidth]{./images/half_density_sqr_t1_00.png}
@@ -873,6 +875,20 @@ Both schemes begin to fail once the exact solution becomes concentrated in a spa
   \includegraphics[width=0.43\textwidth]{./images/transfer_op_t2_00.png}
   \caption{Computed densities via our method and the transfer operator method with respect to the vector field $\dot{x} = \sin(2x)$ and with a uniform density at $t=0$.  The top two panels depict solutions computed with our scheme at time $t=1$ and $t=2$.   The bottom two panels depict the densities computed via transfer operator theory.  In each panel, the exact solution is plotted in black.}
   \label{fig:one_dim_system}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases88scale1T1.pdf}
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases88scale1T2.pdf}
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases160scale2T1.pdf}
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases160scale2T2.pdf}
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases100scale1T1.pdf}
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases100scale1T2.pdf}
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases176scale2T1.pdf}
+  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases176scale2T2.pdf}
+  \caption{Ground truth densities (black) and computed densities using our method (red) with different Daubechies wavelets (rows $1$ and $2$ use the Daubehcies $4$ wavelet and rows $3$ and $4$ use the Daubechies $6$ wavelet) at different scales (rows $1$ and $3$ are computed using bases functions with a maximum resolution of $2^-1$ and rows $2$ and $4$ are computed using bases functions with a maximum resolution of $2^-2$) for the vector field $\dot{x}=\sin(2x)$ at $t=1$ (left column) and $t=2$ (right column) and with a uniform density at $t=0$. Beginning from the top to the bottom row the number of bases functions used to compute the densities depicted in each figure are $88,160,100,$ and $176$.}
+  \label{fig:one_dim_system_wavelet}
 \end{figure}
 
 \subsection{The Van der Pol oscillator}
