@@ -65,7 +65,7 @@
   he or she may wish to compute the probability of landing
   in this dangerous region at time $T$.
   If the initial condition is given in the form of a
-  probabilty density $p(\cdot \mid t=0)$
+  probability density $p(\cdot \mid t=0)$
   the probability of landing in $S$ at time $T$
   is $P( x \in S \mid t = T)  = \int_S p( dx | t=T )$
   where $p(dx|t=T)$ is the advected probability density at time $T$.
@@ -96,7 +96,7 @@
      \det\left[ (D\Phi_X^t)^{-1}(x) \right] p_0\left( \left[\Phi_X^t\right]^{-1}(x) \right), \label{eq:push_forward}
   \end{align}
   where $D\Phi_X^t(x)$ is the Jacobian matrix of
-  $\Phi_X^t$ at the point $x \in \R^n$.
+  $\Phi_X^t$ at the point $x \in \R^n$. \ram{it may be clearer to say $(D\Phi_X^{-t})$ instead of $(D\Phi_X^t)^{-1}$ and similarly for $\Phi$ in the previous equation. Also we probably need a citation for the previous equation.}
   The density $p(x;t)$ represents how the density
   $p_0(x)$ transforms under the flow of $X$.
   We observe that $p(x;0) = p_0(x)$ and, upon taking
@@ -119,7 +119,7 @@
   given by \eqref{eq:Louiville}.
   This will be addressed in \S \ref{sec:math} (see \eqref{eq:advection}).
 
-\subsection{A naive psuedo-spectral method}
+\subsection{A naive pseudo-spectral method}
 \label{sec:naive}
   In this section we will present the simplest type of
   spectral discretization of \eqref{eq:Louiville}.
@@ -151,7 +151,7 @@
 
   However, for finite $N$, there is no guarantee that the reconstructed
   density $\tilde{\rho}(x,t) = \sum_{j=0}^N \rho_{N,j}(t) f_j(x)$
-  is non-negative.
+  is non-negative. \ram{its not clear here why this property is important. We probably don't need to delve into this for the arxiv version but its something we will need to discuss}
   Generically $\tilde{\rho}(x,t)$ will take on both signs, in
   contrast with the exact solution $\rho(x,t)$ (see figure \ref{fig:one_dim_system})
   Moreover, important entities such as the advected moments
@@ -181,13 +181,13 @@
 
 \subsection{Densities}
   A smooth density on $M$ is a smooth means of
-  assigning real numbers to measureable sets.
-  Hueristically, it is a map which
+  assigning real numbers to measurable sets.
+  Heuristically, it is a map which
   takes an infinitesimal box (or volume element)
   on a manifold as input, and outputs the infinitesimal ``size''
   of the box (a real number).
   Therefore, in order to discuss densities,
-  we must first mathematize the notion of an ``infinitesimal box.''
+  we must first formalize the notion of an ``infinitesimal box.''
   This motivates our introduction of \emph{frames}.
   \begin{defn}
   \label{eq:frame_bundle}
@@ -199,7 +199,7 @@
 
   \begin{prop}
     There is a natural transitive
-    action of $\GL(n)$ on each fiber of $\Fr M$.
+    action of $\GL(n)$ on each fiber of $\Fr M$. \ram{we may want to be clear here what ``natural'' means...}
   \end{prop}
 
   \begin{proof}
@@ -269,7 +269,7 @@
   Note that for any $C^1$ diffeomorphism $\Phi:M \to M$,
   there is a map $\Fr(\Phi) : \Fr M \to \Fr M$
   given by 
-  ``$(e_1,\dots,e_n) \mapsto (T\varphi \cdot e_1, \dots, T\varphi \cdot e_n)$''.
+  ``$(e_1,\dots,e_n) \mapsto (T\varphi \cdot e_1, \dots, T\varphi \cdot e_n)$''. \ram{this is unclear, what is $\phi$ versus $\Phi$ and what is $T$.}
   This defines the \emph{pull-back} of an $\alpha$-density
   $\nu \in \Dens^\alpha(N)$
   by $\Phi^* \nu := \nu \circ \Fr(\Phi) \in \Dens^\alpha(M)$.
@@ -331,6 +331,7 @@
       \item $\rho$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1$.
       \item $\psi$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1/2$.
     \end{enumerate}
+\ram{may want to cite the coordinate versions of each as well to make clear the distinction...}
   \end{thm}
   \begin{proof}
     Let $\psi$ satisfy \eqref{eq:advection}.
@@ -438,7 +439,7 @@
     \varphi_*C^k(M) := \{ g \in C^k(V) \mid g = f \circ \varphi^{-1} , f \in C^k(M) \} \subset C^k(V).
   \end{align*}
   Thus any, PDE on $M$ can be fully represented as a PDE on a 
-  subring of functions on $V$.
+  subring of functions on $V$. \ram{This point isn't obvious enough to me. I think we are making three separate points. First, we are saying we can represent the evolution in $V$ using Euclidean methods, we can then use Theorem 2.8 to define the density on $U$. Second, we can define a unique extension to any function or density defined on a dense set of points on any Hausdorff space (this needs a citation and is it obvious that it extends to densities?). Finally, we want to say that for many (all?) manifolds such a dense chart exists and we can construct it explicitly for many examples like we do below. Am I right?}
   This is useful for solving the PDE under concern because it allows
   us to implement wavelet analysis on manifolds.
   Specifically, given our PDE on $\Dens^{1/2}(M)$,
@@ -611,7 +612,7 @@
 \section{An advection scheme}
 \label{sec:scheme}
    In this section we will use Euclidean realizations of wavelet space
-   to implement the an advection scheme for densities on manifolds.
+   to implement an advection scheme for densities on manifolds.
    More specifically, we want to solve the evolution equation
    \begin{align}
      \partial_t \rho + \pounds_X[\rho] = 0 \quad , \quad 
@@ -623,8 +624,7 @@
      \partial_t \psi + \pounds_X[\psi] = 0 \quad , \quad
      \psi(0) = \psi_0 := \rho^{1/2} \in \Dens^{1/2}(M). \label{eq:half_density_advection}
    \end{align}
-   If $\psi(t)$ is a solution to \eqref{eq:half_density_advection}
-   , then Theorem \ref{thm:advection} tells us that $\rho(t) := |\psi(t)|^2$
+   If $\psi(t)$ is a solution to \eqref{eq:half_density_advection}, then theorem \ref{thm:advection} tells us that $\rho(t) := |\psi(t)|^2$
    is a solution to our original problem \eqref{eq:density_advection2}.
    Therefore we seek to solve \eqref{eq:half_density_advection}
    in lieu of solving \eqref{eq:density_advection2}.
@@ -865,7 +865,7 @@ However, the transfer operator method exhibits spurious oscillations and sign ch
  while the half-density advection sheme maintains positivity and the regularity of the exact solution.
 Both schemes begin to fail once the exact solution becomes concentrated in a space below the chosen resolution of $2\pi \times 2^{-6}$.
 
-We can also implement our own method using any wavelet. Snapshots of our method using two different Daubehcies wavelets (the Daubechies 4 and 6 wavelets) each at two different scales are illustrated in figure \ref{fig:one_dim_system_wavelet}. Notice that although four alternatives appear accurate at the two time instances depicted, the Daubechies 6 wavelet appears to perform at both scales. 
+We can also implement our own method using any wavelet. Snapshots of our method using two different Daubehcies (DB) wavelets (the DB 4 and 6 wavelets) each at two different scales are illustrated in figure \ref{fig:one_dim_system_wavelet}. Notice that although four alternatives appear accurate at the two time instances depicted, the DB 6 wavelet appears to perform at both scales. 
 
 \begin{figure}[p]
   \centering
@@ -879,15 +879,15 @@ We can also implement our own method using any wavelet. Snapshots of our method 
 
 \begin{figure}[p]
   \centering
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases88scale1T1.pdf}
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases88scale1T2.pdf}
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases160scale2T1.pdf}
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf4nBases160scale2T2.pdf}
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases100scale1T1.pdf}
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases100scale1T2.pdf}
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases176scale2T1.pdf}
-  \includegraphics[width=0.43\textwidth]{./images/S1Wavelet_sf6nBases176scale2T2.pdf}
-  \caption{Ground truth densities (black) and computed densities using our method (red) with different Daubechies wavelets (rows $1$ and $2$ use the Daubehcies $4$ wavelet and rows $3$ and $4$ use the Daubechies $6$ wavelet) at different scales (rows $1$ and $3$ are computed using bases functions with a maximum resolution of $2^-1$ and rows $2$ and $4$ are computed using bases functions with a maximum resolution of $2^-2$) for the vector field $\dot{x}=\sin(2x)$ at $t=1$ (left column) and $t=2$ (right column) and with a uniform density at $t=0$. Beginning from the top to the bottom row the number of bases functions used to compute the densities depicted in each figure are $88,160,100,$ and $176$.}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf4nBases88scale1T1.pdf}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf4nBases88scale1T2.pdf}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf4nBases160scale2T1.pdf}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf4nBases160scale2T2.pdf}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf6nBases100scale1T1.pdf}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf6nBases100scale1T2.pdf}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf6nBases176scale2T1.pdf}
+  \includegraphics[width=0.4\textwidth]{./images/S1Wavelet_sf6nBases176scale2T2.pdf}
+  \caption{Ground truth densities (black) and densities computed using our method (red) with different DB wavelets (rows $1$ and $2$ use the DB $4$ wavelet and rows $3$ and $4$ use the DB $6$ wavelet) at different scales (rows $1$ and $3$ are computed via bases functions with a resolution of $2^{-1}$ and rows $2$ and $4$ are computed via bases functions with a maximum resolution of $2^{-2}$) for the vector field $\dot{x}=\sin(2x)$ at $t=1$ (left column) and $2$ (right column) and with a uniform density at $t=0$. Beginning from the top row the number of bases functions used to compute the densities in each row are $88,160,100,$ and $176$.}
   \label{fig:one_dim_system_wavelet}
 \end{figure}
 
@@ -908,11 +908,11 @@ The vector-field is depicted in figure \ref{fig:vdp_quiver}.
 \end{figure}
 
 This vector field is particularly difficult for multiple reasons.
-Firstly, the system is on a noncompact domain, so we are unable to
+Firstly, the system is on a non-compact domain, so we are unable to
 resolve the full domain using a finite set of basis functions.
-Secondly, if we restrict ourselve to a compact subset, the boundary conditions are non-vanishing.  Even worse, they are a mixture of inflowing
+Secondly, if we restrict ourselves to a compact subset, the boundary conditions are non-vanishing.  Even worse, they are a mixture of inflowing
 and outflowing.
-Finally, the system exibits a limit cycle.
+Finally, the system exhibits a limit cycle.
 As densities are attracted towards the limit cycle, they are 
 exponentially flattened.  Eventually the density will flatten 
 into a length scale below that which we've resolved.
@@ -920,9 +920,8 @@ into a length scale below that which we've resolved.
 Despite these problems on the boundaries, and with the resolution,
 we are still able to construct a scheme which works on small times
 in regions near the origin.
-We consider a basis generated by Debauchies wavelets,
+We consider a basis generated by DB wavelets,
 on the domain $[-8,8] \times [-8,8]$ with finest scale $2^{-3}$.
-\todo[inline]{hoj:  You'll probably need to elaborate on this Ram.}
 A typical advection is shown in 
 figure \ref{fig:vdp_advection}.
 One can see the density begin to hug the side of the limit cycle
@@ -1020,7 +1019,7 @@ Future work entails clarifying what ``reasonable'' means.
 Secondly, the scheme appears to conserve a number of other
 properties at arbitrarily low resolutions.
 For example, the space of functions is discretized as
-a ring of Hermetian operators.
+a ring of Hermitian operators.
 This ring structure is preserved under our scheme.
 Enumerating the many other structures which are preserved 
 by the scheme will be elucidated in future work as well.
