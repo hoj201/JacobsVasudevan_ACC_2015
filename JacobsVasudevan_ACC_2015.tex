@@ -81,9 +81,6 @@
   In this paper we will present an algorithm which preserves the positivity
   of the space of probability densities at arbitrary resolutions.
 
-  \todo[inline]{It preserves so much more, but this is sort of a can of worms if all we want is a fast ArXiV paper at this point.  In particular, it
-  preserves a discretized notion of ``moments''}.
-
 \subsection{Background material}
   Let $p_0$ be a probability density on $\R^n$
   and let $X$ be a vector-field on $\R^n$.
@@ -105,7 +102,7 @@
     \partial_t p (x;t) + \partial_i (X^i p)(x) = 0 \label{eq:Louiville}
   \end{align}
   for all $x \in \R^n$.
-  Equation \eqref{eq:Louiville} is known as the \emph{Louiville equation}.
+  Equation \eqref{eq:Louiville} is known as the \emph{Louiville equation} (see \cite{LasotaMackey1994}).
   Using \eqref{eq:push_forward} to compute $p$ is difficult
   because $\Phi_X^t$ is typically a non-linear map with no closed
   form expression.
@@ -152,15 +149,29 @@
   However, for finite $N$, there is no guarantee that the reconstructed
   density $\tilde{\rho}(x,t) = \sum_{j=0}^N \rho_{N,j}(t) f_j(x)$
   is non-negative. \ram{its not clear here why this property is important. We probably don't need to delve into this for the arxiv version but its something we will need to discuss}
+  \hoj{I tried to address this briefly in the last sentence of this paragraph and the last paragraph of this section.}
   Generically $\tilde{\rho}(x,t)$ will take on both signs, in
-  contrast with the exact solution $\rho(x,t)$ (see figure \ref{fig:one_dim_system})
+  contrast with the exact solution $\rho(x,t)$ (see figure \ref{fig:one_dim_system}).
   Moreover, important entities such as the advected moments
-  $\tilde{m}_i(t) = \int \tilde{\rho}(x,t) (\Phi_X^t)_*(f_i)dx$
+  $$\tilde{m}^k_i(t) = \int \tilde{\rho}(x,t) (\Phi_X^t)_*((x_i)^k)dx$$
   may fluctuate, also in contrast with the exact moments
-  $m_i = \int \rho(x,t)  (\Phi_X^t)_*(f_i) dx$.
+  $m^k_i = \int \rho(x,t)  (\Phi_X^t)_*((x_i)^k) dx$.
+  From the standpoint of interpretation, positivity and moments are important
+  aspects of probability densities.  There is no agreed upon interpretation of
+  ``negative probability'', and aspects such as moments serve as important
+  qualitative characteristics of a given probability density (the zeroth moment
+  is the average, the first moment is the variance, and so on).
+  
   When dealing with manifolds of even moderate dimensions
   (e.g. $d=3$) it is important for a method to behave well at finite $N$'s
   because it is infeasible to finely resolve along each dimension.
+  If the qualitative aspects of flows (such as conserved quantities and positivity
+  constraints) can be incorporated into the numerics at arbitrary resolutions
+  it is more likely that the resulting numerical scheme will produce qualitatively
+  accurate results.
+  This allows the analyst to focus on other aspects of the system at hand
+  without worrying about the inconsistency errors which arise in schemes
+  which do not preserve structure.
 
 \subsection{Main contributions}
   In this paper we will present a method for advection of
@@ -200,6 +211,7 @@
   \begin{prop}
     There is a natural transitive
     action of $\GL(n)$ on each fiber of $\Fr M$. \ram{we may want to be clear here what ``natural'' means...}
+    \hoj{meh...  Maybe we can just delete the word ``natural''.  It's hard to explain efficiently, and there is little gained from it's use, even for a mathematician.}
   \end{prop}
 
   \begin{proof}
@@ -269,7 +281,8 @@
   Note that for any $C^1$ diffeomorphism $\Phi:M \to M$,
   there is a map $\Fr(\Phi) : \Fr M \to \Fr M$
   given by 
-  ``$(e_1,\dots,e_n) \mapsto (T\varphi \cdot e_1, \dots, T\varphi \cdot e_n)$''. \ram{this is unclear, what is $\phi$ versus $\Phi$ and what is $T$.}
+  ``$(e_1,\dots,e_n) \mapsto (T\Phi \cdot e_1, \dots, T\Phi \cdot e_n)$''. \ram{this is unclear, what is $\phi$ versus $\Phi$ and what is $T$?}
+  \hoj{We state that $T$ is the tangent functor in the section on notation.  We can include a definition of the Tangent functor if you like.}
   This defines the \emph{pull-back} of an $\alpha$-density
   $\nu \in \Dens^\alpha(N)$
   by $\Phi^* \nu := \nu \circ \Fr(\Phi) \in \Dens^\alpha(M)$.
@@ -303,22 +316,21 @@
     is an anti-symmetric linear operator on $\Dens^{1/2}(M)$.
   \end{cor}
   With the Lie-derivative defined we can write the advection
-  PDE for densities as
+  PDE for $\alpha$-densities as
   \begin{align}
-    \partial_t \nu + \pounds_X[\nu] = 0 \label{eq:advection},
+    \partial_t \nu + \pounds_X[\nu] = 0  \quad,\quad \nu(t) \in \Dens^\alpha(M) \label{eq:advection}.
   \end{align}
-  for a time-dependent $\alpha$-density $\nu(t) \in \Dens^\alpha(M)$
-  which is advected infinitesimally by the vector field 
+  This is the equation for a time-dependent $\alpha$-density which is advected by the vector field 
   $X \in \mathfrak{X}(M)$.
   If $\alpha = 1$, \eqref{eq:advection} is written in local coordinates
   as \eqref{eq:Louiville}.
   If $\nu(t) = \psi(t) \in \Dens^{1/2}(M)$ is a half-density, then
   \eqref{eq:advection} is written in local coordinates as
-  \begin{align*}
+  \begin{align}
     \partial_t \psi(x) 
     + \frac{1}{2} X^i(x) \partial_i \psi(x) 
-    + \frac{1}{2} \partial_i (\psi \cdot X^i)(x) \psi(x) = 0.
-  \end{align*}
+    + \frac{1}{2} \partial_i (\psi \cdot X^i)(x) \psi(x) = 0. \label{eq:local_half_density_advection}
+  \end{align}
   Note that this equation appears to be the average of the advection equation for densities ($\Dens^1(M)$) and the advection equation for functions ($\Dens^0(M)$).
 
   \begin{thm} \label{thm:advection}
@@ -328,10 +340,9 @@
     Let $X \in \mathfrak{X}(M)$.
     The following are equivalent:
     \begin{enumerate}
-      \item $\rho$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1$.
-      \item $\psi$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1/2$.
+      \item $\rho$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1$ (locally given by \eqref{eq:Louiville}).
+      \item $\psi$ satisfies the advection equation \eqref{eq:advection} with $\alpha = 1/2$ (locally given by \eqref{eq:local_half_density_advection}).
     \end{enumerate}
-\ram{may want to cite the coordinate versions of each as well to make clear the distinction...}
   \end{thm}
   \begin{proof}
     Let $\psi$ satisfy \eqref{eq:advection}.
@@ -440,6 +451,19 @@
   \end{align*}
   Thus any, PDE on $M$ can be fully represented as a PDE on a 
   subring of functions on $V$. \ram{This point isn't obvious enough to me. I think we are making three separate points. First, we are saying we can represent the evolution in $V$ using Euclidean methods, we can then use Theorem 2.8 to define the density on $U$. Second, we can define a unique extension to any function or density defined on a dense set of points on any Hausdorff space (this needs a citation and is it obvious that it extends to densities?). Finally, we want to say that for many (all?) manifolds such a dense chart exists and we can construct it explicitly for many examples like we do below. Am I right?}
+  \hoj{We are interpreting the use of Theorem 2.8 differently.  Here is my interpretation.
+  One may think computations on $M$ are difficult, because $M$ is non-Euclidean.
+  This makes the space $C^k(M), \Dens^\alpha(M), \mathfrak{X}(M)$ somewhat 
+  harder to describe than the space $C^k(V), \Dens^\alpha(V), \mathfrak{X}(V)$
+  where $V$ is something like a unit ball in $\mathbb{R}^n$.
+  However, given a dense chart, $\varphi:U \to V$,
+  a calculation involving functions, densities, and vector fields on $M$
+  may be written as a calculation involving functions, densities, and vector-fields on $V$.
+  By Theorem 2.8, this is done without any loss of information (because $f \mapsto \varphi_* f$ is injective).
+  Now that we have a calculation which lives on $V$ we can use wavelets.
+  If you want to recover the original thing on $M$ you need to invert this map, which you can do if you
+  don't screw anything up because it is an injective map.}
+  
   This is useful for solving the PDE under concern because it allows
   us to implement wavelet analysis on manifolds.
   Specifically, given our PDE on $\Dens^{1/2}(M)$,
