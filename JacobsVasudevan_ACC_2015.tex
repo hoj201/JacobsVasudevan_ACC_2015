@@ -1,9 +1,10 @@
 \documentclass[letterpaper, 12 pt]{amsart}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=1.5in]{geometry}
 \usepackage{amsmath} % assumes amsmath package installed
 \usepackage{amssymb}  % assumes amsmath package installed
 \usepackage{todonotes}
-\usepackage[nomarkers,figuresonly]{endfloat}
+\usepackage{amsaddr}
+%\usepackage[nomarkers,figuresonly]{endfloat}
 
 % NEW COMMANDS
 \newcommand{\hoj}[1]{\todo[inline,color=blue!20]{#1}}
@@ -34,7 +35,15 @@
   densities on manifolds
 }
 
-\author{Henry O. Jacobs and Ram Vasudevan}% <-this % stops a space
+\author{Henry O. Jacobs}
+\address{Research Associate in Mathematics\\
+180 Queen's Gate Rd, London, United Kingdom, SW7 2AZ \\}
+
+\author{Ram Vasudevan}
+\address{Assistant Professor in Mechanical Engineering\\
+G058 AL (W.E. Lay Auto Lab)\\
+1231 Beal , Ann Arbor, MI 48109-2133}
+\email{h.jacobs@imperial.ac.uk,ramv@umich.edu}
 
 \begin{document}
 
@@ -93,7 +102,7 @@
      \det\left[ (D\Phi_X^t)^{-1}(x) \right] p_0\left( \left[\Phi_X^t\right]^{-1}(x) \right), \label{eq:push_forward}
   \end{align}
   where $D\Phi_X^t(x)$ is the Jacobian matrix of
-  $\Phi_X^t$ at the point $x \in \R^n$. \ram{it may be clearer to say $(D\Phi_X^{-t})$ instead of $(D\Phi_X^t)^{-1}$ and similarly for $\Phi$ in the previous equation. Also we probably need a citation for the previous equation.}
+  $\Phi_X^t$ at the point $x \in \R^n$.
   The density $p(x;t)$ represents how the density
   $p_0(x)$ transforms under the flow of $X$.
   We observe that $p(x;0) = p_0(x)$ and, upon taking
@@ -148,14 +157,24 @@
 
   However, for finite $N$, there is no guarantee that the reconstructed
   density $\tilde{\rho}(x,t) = \sum_{j=0}^N \rho_{N,j}(t) f_j(x)$
-  is non-negative. \ram{its not clear here why this property is important. We probably don't need to delve into this for the arxiv version but its something we will need to discuss}
-  \hoj{I tried to address this briefly in the last sentence of this paragraph and the last paragraph of this section.}
+  is non-negative. 
   Generically $\tilde{\rho}(x,t)$ will take on both signs, in
-  contrast with the exact solution $\rho(x,t)$ (see figure \ref{fig:one_dim_system}).
+  contrast with the exact solution $\rho(x,t)$ (see figure \ref{fig:transfer_op}).
+  
+  \begin{figure}[h!]
+	\centering
+  	\includegraphics[width=0.4\textwidth]{./images/transfer_op_t1_00.png}
+  	\includegraphics[width=0.4\textwidth]{./images/transfer_op_t2_00.png}
+	\caption{Red lines indicate numerically computed densities advected by, $\dot{x} = \sin(2x)$, via the transfer operator method with a resolution of $2\pi / 2^5$
+		at time $t=1$ and $t=2$. The initial condition is a uniform distribution.
+		Black lines plot the exact solution given by \eqref{eq:benchmark}.}
+	\label{fig:transfer_op}
+\end{figure}
+  
   Moreover, important entities such as the advected moments
   $$\tilde{m}^k_i(t) = \int \tilde{\rho}(x,t) (\Phi_X^t)_*((x_i)^k)dx$$
   may fluctuate, also in contrast with the exact moments
-  $m^k_i = \int \rho(x,t)  (\Phi_X^t)_*((x_i)^k) dx$.
+  $$m^k_i = \int \rho(x,t)  (\Phi_X^t)_*((x_i)^k) dx.$$
   From the standpoint of interpretation, positivity and moments are important
   aspects of probability densities.  There is no agreed upon interpretation of
   ``negative probability'', and aspects such as moments serve as important
@@ -178,9 +197,6 @@
   probability densities on manifolds.
   This method will yield reconstructed probability measures
   which are non-negative and mass conserving at any finite resolution.
-
-\subsection{Notation}
-  Manifolds, tangent bundles, vector fields, closure of a set (bar notation)
 
 \section{Mathematical preliminaries}
 \label{sec:math}
@@ -209,9 +225,8 @@
   \end{defn}
 
   \begin{prop}
-    There is a natural transitive
-    action of $\GL(n)$ on each fiber of $\Fr M$. \ram{we may want to be clear here what ``natural'' means...}
-    \hoj{meh...  Maybe we can just delete the word ``natural''.  It's hard to explain efficiently, and there is little gained from it's use, even for a mathematician.}
+    There is a transitive
+    action of $\GL(n)$ on each fiber of $\Fr M$.
   \end{prop}
 
   \begin{proof}
@@ -272,7 +287,7 @@
   \begin{proof}
     Let $e \in \Fr M$ and $A \in \GL(n)$.
     We observe $\psi_1(A \cdot e) \psi_2(A \cdot e) = |\det(A) | \psi_1(e) \psi_2(e)$.  Thus $\psi_1 \psi_2 \in \Dens(M)$.
-    Conversely $\pm \sqrt{\rho( A \cdot e)} = \pm | \det(A) |^{1/2} \sqrt{ \rho(e)}$. So $\pm \sqrt{\rho} \in \Dens^{1/2}(M)$.
+    Conversely $$\pm \sqrt{\rho( A \cdot e)} = \pm | \det(A) |^{1/2} \sqrt{ \rho(e)}.$$ So $\pm \sqrt{\rho} \in \Dens^{1/2}(M)$.
     Finally, if $\psi \neq 0$ we see that $\| \psi \|^2 := \langle \psi , \psi \rangle \neq 0$.
     Thus $\langle \cdot , \cdot \rangle$ is weakly non-degenerate
     and defines an inner-product on $\Dens^{1/2}(M)$.
@@ -281,8 +296,7 @@
   Note that for any $C^1$ diffeomorphism $\Phi:M \to M$,
   there is a map $\Fr(\Phi) : \Fr M \to \Fr M$
   given by 
-  ``$(e_1,\dots,e_n) \mapsto (T\Phi \cdot e_1, \dots, T\Phi \cdot e_n)$''. \ram{this is unclear, what is $\phi$ versus $\Phi$ and what is $T$?}
-  \hoj{We state that $T$ is the tangent functor in the section on notation.  We can include a definition of the Tangent functor if you like.}
+  ``$(e_1,\dots,e_n) \mapsto (T\Phi \cdot e_1, \dots, T\Phi \cdot e_n)$''.
   This defines the \emph{pull-back} of an $\alpha$-density
   $\nu \in \Dens^\alpha(N)$
   by $\Phi^* \nu := \nu \circ \Fr(\Phi) \in \Dens^\alpha(M)$.
@@ -349,14 +363,14 @@
     We find
     \begin{align*}
       \partial_t (\psi^2) &= 2 \partial_t\psi \cdot \psi
-      =-2 \pounds_X[\psi] \psi \\
-      &= - 2 \left[ \left.\frac{d}{dt}\right|_{t=0}
+      =-2 \pounds_X[\psi] \psi 
+      = - 2 \left[ \left.\frac{d}{dt}\right|_{t=0}
          (\Phi_X^t)^* \psi \right] \cdot \psi \\
       &= - \left. \frac{d}{dt} \right|_{t=0}
-        \left[ (\Phi_X^t)^* \psi \cdot (\Phi_X^t)^* \psi \right]\\
-      &= - \left. \frac{d}{dt} \right|_{t=0}
-        \left[ (\Phi_X^t)^* (\psi^2) \right] 
-      = - \pounds_X[\psi^2].
+        \left[ (\Phi_X^t)^* \psi \cdot (\Phi_X^t)^* \psi \right]
+      = - \left. \frac{d}{dt} \right|_{t=0}
+        \left[ (\Phi_X^t)^* (\psi^2) \right] \\
+      &= - \pounds_X[\psi^2].
     \end{align*}
     Therefore $\rho = \psi^2$ satisfies \eqref{eq:advection}.
     Conversely, if $\rho$ satisfies \eqref{eq:advection}
@@ -450,19 +464,8 @@
     \varphi_*C^k(M) := \{ g \in C^k(V) \mid g = f \circ \varphi^{-1} , f \in C^k(M) \} \subset C^k(V).
   \end{align*}
   Thus any, PDE on $M$ can be fully represented as a PDE on a 
-  subring of functions on $V$. \ram{This point isn't obvious enough to me. I think we are making three separate points. First, we are saying we can represent the evolution in $V$ using Euclidean methods, we can then use Theorem 2.8 to define the density on $U$. Second, we can define a unique extension to any function or density defined on a dense set of points on any Hausdorff space (this needs a citation and is it obvious that it extends to densities?). Finally, we want to say that for many (all?) manifolds such a dense chart exists and we can construct it explicitly for many examples like we do below. Am I right?}
-  \hoj{We are interpreting the use of Theorem 2.8 differently.  Here is my interpretation.
-  One may think computations on $M$ are difficult, because $M$ is non-Euclidean.
-  This makes the space $C^k(M), \Dens^\alpha(M), \mathfrak{X}(M)$ somewhat 
-  harder to describe than the space $C^k(V), \Dens^\alpha(V), \mathfrak{X}(V)$
-  where $V$ is something like a unit ball in $\mathbb{R}^n$.
-  However, given a dense chart, $\varphi:U \to V$,
-  a calculation involving functions, densities, and vector fields on $M$
-  may be written as a calculation involving functions, densities, and vector-fields on $V$.
-  By Theorem 2.8, this is done without any loss of information (because $f \mapsto \varphi_* f$ is injective).
-  Now that we have a calculation which lives on $V$ we can use wavelets.
-  If you want to recover the original thing on $M$ you need to invert this map, which you can do if you
-  don't screw anything up because it is an injective map.}
+  subring of functions on $V$. 
+  %\ram{This point isn't obvious enough to me. I think we are making three separate points. First, we are saying we can represent the evolution in $V$ using Euclidean methods, we can then use Theorem 2.8 to define the density on $U$. Second, we can define a unique extension to any function or density defined on a dense set of points on any Hausdorff space (this needs a citation and is it obvious that it extends to densities?). Finally, we want to say that for many (all?) manifolds such a dense chart exists and we can construct it explicitly for many examples like we do below. Am I right?}
   
   This is useful for solving the PDE under concern because it allows
   us to implement wavelet analysis on manifolds.
@@ -542,9 +545,12 @@
   the inner-product space of half densities $\Dens^{1/2}(S^2)$
   is isometric to the subspace
   \begin{align*}
-    \varphi_* \Dens^{1/2}(S^2) &= \{ \psi \in \Dens^{1/2}(V) \mid \\
-    & \quad \psi = f \otimes  (\sin(\theta) d\theta \wedge d\phi)^{1/2} ,\\
-    & \quad f \in \varphi_*C^0(S^2) \}.
+    \varphi_* \Dens^{1/2}(S^2) &= \left\{ \psi \in \Dens^{1/2}(V) \mid 
+    	\begin{array}{l}
+		\psi = f \otimes  (\sin(\theta) d\theta \wedge d\phi)^{1/2} , \\
+		f \in \varphi_*C^0(S^2)
+	\end{array}
+	\right\}.
   \end{align*}
 
   % One concern is the assumption that there exists a chart which
@@ -863,43 +869,46 @@
 %   \end{proof}
 
 
-\section{Examples}
-\label{sec:Examples}
-
-\subsection{Benchmark comparison with the Transfer-operator approach}
+\section{A Benchmark computation}
 Consider the ODE $X(x) = \sin(2x) \partial_x$ on the unit circle, $S^1$.
 We can solve for the flow in closed from.  We find
-$\Phi_X^t(x) = \arccot( e^{-2t} \cot(x) )$.
+$\Phi_X^t(x) = \arccot( e^{-2t} \cot(x) )$,
+ and the inverse of $\Phi_X^t$ is the map $[\Phi_X^t]^{-1}(y) = \arccot( e^{2t} \cot(y) )$.
 Using \eqref{eq:push_forward}
 we obtain the solution to \eqref{eq:density_advection2} with initial condition $p_0(x)$ as the time-dependent density
-\begin{align*}
-  &p(x,t) = \\
-  &\quad p_0\left[ \arccot \left( \cot(x)e^{-2t} \right)\right]
-  \left( e^{2t} \cos^2(x) + e^{-2t} \sin^2(x)  \right)^{-1}.
-\end{align*}
+\begin{align}
+  p(x,t) = p_0\left[ \arccot \left( \cot(x)e^{2t} \right)\right]
+  \left( e^{2t} \cos^2(x) + e^{-2t} \sin^2(x)  \right)^{-1}. \label{eq:benchmark}
+\end{align}
 Similarly, the solution to \eqref{eq:half_density_advection} with the initial condition $\psi_0(x)$ is the time-dependent half-density
 \begin{align*}
-  &\psi(x,t) = \\
-  &\quad \psi_0\left[\arccot\left( \cot(x)e^{-2t} \right) \right]
+  \psi(x,t) =  \quad \psi_0\left[\arccot\left( \cot(x)e^{2t} \right) \right]
   \left( e^{2t} \cos^2(x) + e^{-2t} \sin^2(x) \right)^{-1/2}. 
 \end{align*}
-We can use the Haar-wavelet to implement the method mentioned in \S \ref{sec:naive}.  This equivalent to partitioning the space into cells and computing fluxes \cite{FroylandJungeKoltai2013}.  We can implement our own method with respect to the Haar wavelet as well (i.e. \S \ref{sec:scheme}).  Snapshots are shown in figure \ref{fig:one_dim_system}.
-Both schemes appear accurate at time $t=1$ and earlier.
-However, the transfer operator method exhibits spurious oscillations and sign changes around time $t=2$,
- while the half-density advection sheme maintains positivity and the regularity of the exact solution.
+We can use the Haar-wavelet to implement the method mentioned in section \ref{sec:naive}.
+This equivalent to the transfer operator approach wherein one partitions the space into cells and computes fluxes \cite{FroylandJungeKoltai2013}.
+We do this for a uniform distribution on the circle, and depict the numerically computed solutions at time $t=1,2$ in figure \ref{fig:transfer_op} (page \pageref{fig:transfer_op}).
+This scheme appears to be at least qualitatively accurate at time $t=1$ and earlier.
+However, the transfer operator method exhibits spurious spatial oscillations and negative probability densities at $t=2$ and beyond.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.4\textwidth]{./images/half_density_sqr_t1_00.png}
+  \includegraphics[width=0.4\textwidth]{./images/half_density_sqr_t2_00.png}
+  \caption{Snapshots of numerically computed densities at $t=1,2$ with respect to the ODE ``$\dot{x} = \sin(2x)$''.
+  	Red indicates densities computed via our numerical scheme  (\S \ref{sec:scheme}) with a resolution of $2\pi / 2^5$
+  	using the Haar wavelet. Black indicates the exact solution, \eqref{eq:benchmark}.
+	The initial condition is a uniform density.}
+  \label{fig:half_density_haar}
+\end{figure}
+
+For the purpose of comparison, we can also use the Haar wavelet to implement the half-density based method described in section \ref{sec:scheme}.
+Numerically computed solutions are with respect to our new method are depicted in figure \ref{fig:half_density_haar} (page \pageref{fig:half_density_haar}).
+We observe that the half-density advection scheme maintains positivity and the regularity of the exact solution.
+
 Both schemes begin to fail once the exact solution becomes concentrated in a space below the chosen resolution of $2\pi \times 2^{-6}$.
 
-We can also implement our own method using any wavelet. Snapshots of our method using two different Daubehcies (DB) wavelets (the DB 4 and 6 wavelets) each at two different scales are illustrated in figure \ref{fig:one_dim_system_wavelet}. Notice that although four alternatives appear accurate at the two time instances depicted, the DB 6 wavelet appears to perform at both scales. 
-
-\begin{figure}[p]
-  \centering
-  \includegraphics[width=0.43\textwidth]{./images/half_density_sqr_t1_00.png}
-  \includegraphics[width=0.43\textwidth]{./images/half_density_sqr_t2_00.png}
-  \includegraphics[width=0.43\textwidth]{./images/transfer_op_t1_00.png}
-  \includegraphics[width=0.43\textwidth]{./images/transfer_op_t2_00.png}
-  \caption{Computed densities via our method and the transfer operator method with respect to the vector field $\dot{x} = \sin(2x)$ and with a uniform density at $t=0$.  The top two panels depict solutions computed with our scheme at time $t=1$ and $t=2$.   The bottom two panels depict the densities computed via transfer operator theory.  In each panel, the exact solution is plotted in black.}
-  \label{fig:one_dim_system}
-\end{figure}
+Finally, we can also implement our own method using any wavelet. Snapshots of our method using two different Daubehcies (DB) wavelets (the DB 4 and 6 wavelets) each at two different scales are illustrated in figure \ref{fig:one_dim_system_wavelet} (page \pageref{fig:one_dim_system_wavelet}). Notice that although four alternatives appear accurate at the two time instances depicted, the DB 6 wavelet appears to perform at both scales. 
 
 \begin{figure}[p]
   \centering
@@ -914,58 +923,58 @@ We can also implement our own method using any wavelet. Snapshots of our method 
   \caption{Ground truth densities (black) and densities computed using our method (red) with different DB wavelets (rows $1$ and $2$ use the DB $4$ wavelet and rows $3$ and $4$ use the DB $6$ wavelet) at different scales (rows $1$ and $3$ are computed via bases functions with a resolution of $2^{-1}$ and rows $2$ and $4$ are computed via bases functions with a maximum resolution of $2^{-2}$) for the vector field $\dot{x}=\sin(2x)$ at $t=1$ (left column) and $2$ (right column) and with a uniform density at $t=0$. Beginning from the top row the number of bases functions used to compute the densities in each row are $88,160,100,$ and $176$.}
   \label{fig:one_dim_system_wavelet}
 \end{figure}
+\pagebreak
+%\subsection{The Van der Pol oscillator}
+%Consider the system on $\R^2$ given by the ODE
+%\begin{align}
+%  \begin{split}
+%    \dot{x} &= y \\
+%    \dot{y} &= (1-x^2)y-x
+%   \end{split} \label{eq:vdp}
+%\end{align}
+%The vector-field is depicted in figure \ref{fig:vdp_quiver}.
+%\begin{figure}[p]
+%  \centering
+%  \includegraphics[width=0.5\textwidth]{./images/vdp_traj.png}
+%  \caption{A quiver plot of the vector-field given by \eqref{eq:vdp}.  The trajectory with initial condition (1.5,0) is shown in blue.}
+%  \label{fig:vdp_quiver}
+%\end{figure}
+%
+%This vector field is particularly difficult for multiple reasons.
+%Firstly, the system is on a non-compact domain, so we are unable to
+%resolve the full domain using a finite set of basis functions.
+%Secondly, if we restrict ourselves to a compact subset, the boundary conditions are non-vanishing.  Even worse, they are a mixture of inflowing
+%and outflowing.
+%Finally, the system exhibits a limit cycle.
+%As densities are attracted towards the limit cycle, they are 
+%exponentially flattened.  Eventually the density will flatten 
+%into a length scale below that which we've resolved.
+%
+%Despite these problems on the boundaries, and with the resolution,
+%we are still able to construct a scheme which works on small times
+%in regions near the origin.
+%We consider a basis generated by DB wavelets,
+%on the domain $[-8,8] \times [-8,8]$ with finest scale $2^{-3}$.
+%A typical advection is shown in 
+%figure \ref{fig:vdp_advection}.
+%One can see the density begin to hug the side of the limit cycle
+%at time $t=1$.
+%
+%
+%\begin{figure}[p]
+%  \centering
+%  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p0.png}
+%  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p30.png}
+%  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p64.png}
+%  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p97.png}
+%  \caption{Computed densities given a Gaussian initial condition
+%    and advected by \eqref{eq:vdp}.
+%    Snapshots are displayed at time $t=0.00,0.30,0.64,0.97$.
+%  }
+%  \label{fig:vdp_advection}
+%\end{figure}
 
-\subsection{The Van der Pol oscillator}
-Consider the system on $\R^2$ given by the ODE
-\begin{align}
-  \begin{split}
-    \dot{x} &= y \\
-    \dot{y} &= (1-x^2)y-x
-   \end{split} \label{eq:vdp}
-\end{align}
-The vector-field is depicted in figure \ref{fig:vdp_quiver}.
-\begin{figure}[p]
-  \centering
-  \includegraphics[width=0.5\textwidth]{./images/vdp_traj.png}
-  \caption{A quiver plot of the vector-field given by \eqref{eq:vdp}.  The trajectory with initial condition (1.5,0) is shown in blue.}
-  \label{fig:vdp_quiver}
-\end{figure}
-
-This vector field is particularly difficult for multiple reasons.
-Firstly, the system is on a non-compact domain, so we are unable to
-resolve the full domain using a finite set of basis functions.
-Secondly, if we restrict ourselves to a compact subset, the boundary conditions are non-vanishing.  Even worse, they are a mixture of inflowing
-and outflowing.
-Finally, the system exhibits a limit cycle.
-As densities are attracted towards the limit cycle, they are 
-exponentially flattened.  Eventually the density will flatten 
-into a length scale below that which we've resolved.
-
-Despite these problems on the boundaries, and with the resolution,
-we are still able to construct a scheme which works on small times
-in regions near the origin.
-We consider a basis generated by DB wavelets,
-on the domain $[-8,8] \times [-8,8]$ with finest scale $2^{-3}$.
-A typical advection is shown in 
-figure \ref{fig:vdp_advection}.
-One can see the density begin to hug the side of the limit cycle
-at time $t=1$.
-
-
-\begin{figure}[p]
-  \centering
-  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p0.png}
-  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p30.png}
-  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p64.png}
-  \includegraphics[width=0.43\textwidth]{./images/vdp_t0p97.png}
-  \caption{Computed densities given a Gaussian initial condition
-    and advected by \eqref{eq:vdp}.
-    Snapshots are displayed at time $t=0.00,0.30,0.64,0.97$.
-  }
-  \label{fig:vdp_advection}
-\end{figure}
-
-\subsection{The rigid body equations}
+\section{Example: the rigid body equations}
 In the absence of external forces
 the equations of motion for the angular momentum, $\Pi \in \R^3$,
 of a rigid body are
@@ -991,13 +1000,12 @@ In spherical coordinates, the dynamics are given by
 \end{align*}
 A plot of various trajectories on $S^2$ is depicted in figure \ref{fig:rigid_body_traj}.
 
-\begin{figure}[p]
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{./images/rigid_body_traj.png}
   \caption{trajectories of \eqref{eq:rigid_body} on the unit sphere.}
   \label{fig:rigid_body_traj}
 \end{figure}
-
 We can consider the global chart induced by spherical coordinates.
 Specifically, this is the chart with
 \begin{align*}
@@ -1013,15 +1021,8 @@ We may approximate $C^0(V)$ using the Haar wavelet,
 and then push-forward these approximations
 to obtain an advection scheme on $S^2$.
 
-We simulate an initial density which consists of 
-a smooth bump function around the point $(-1,0,0)$.
-There is a saddle point at $(-1,0,0)$, and so 
-we should expect the distribution to tend towards
-a singular distribution concentrated along the unstable
-submanifold associated to the saddle point.
-The result is depicted in figure \ref{fig:sphere}
 
-\begin{figure}[p]
+\begin{figure}[h]
   \centering
   \includegraphics[width=0.24\textwidth]{./images/sphere_t0}
   \includegraphics[width=0.24\textwidth]{./images/sphere_t2p5}
@@ -1030,6 +1031,16 @@ The result is depicted in figure \ref{fig:sphere}
   \caption{Snapshots at time $t=0.0,2.5,5.0,7.5$ of evolution on the 2-sphere, according to the rigid body equations.}
   \label{fig:sphere}
 \end{figure}
+
+We simulate an initial density which consists of 
+a smooth bump function around the point $(-1,0,0)$.
+There is a saddle point at $(-1,0,0)$, and so 
+we should expect the distribution to tend towards
+a singular distribution concentrated along the unstable
+submanifold associated to the saddle point.
+The result is depicted in figure \ref{fig:sphere}
+
+
 
 \section{Conclusion and future work}
 In this article we have presented a spectral advection scheme which preserves the positivity of probability densities at arbitrarily low resolutions.
@@ -1054,6 +1065,52 @@ H.O.J. is supported by European Research Council Advanced Grant 267382 FCCA.
 
 
 \bibliographystyle{IEEEtran}
-\bibliography{./hoj_2014}
+%\bibliography{./hoj_2014}
+% Generated by IEEEtran.bst, version: 1.13 (2008/09/30)
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{#1}
+\csname url@samestyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
+\providecommand{\BIBentryALTinterwordstretchfactor}{4}
+\providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand{\BIBforeignlanguage}[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+\providecommand{\BIBdecl}{\relax}
+\BIBdecl
 
+\bibitem{LasotaMackey1994}
+A.~Lasota and M.~C. Mackey, \emph{Chaos, Fractals, and Noise}, ser. Applied
+  Mathematical Sciences.\hskip 1em plus 0.5em minus 0.4em\relax Springer
+  Verlag, 1994.
+
+\bibitem{FroylandJungeKoltai2013}
+\BIBentryALTinterwordspacing
+G.~Froyland, O.~Junge, and P.~Koltai, ``Estimating long-term behavior of flows
+  without trajectory integration: the infinitesimal generator approach,''
+  \emph{SIAM J. Numer. Anal.}, vol.~51, no.~1, pp. 223--247, 2013. [Online].
+  Available: \url{http://dx.doi.org/10.1137/110819986}
+\BIBentrySTDinterwordspacing
+
+\bibitem{BatesWeinstein1997}
+S.~Bates and A.~Weinstein, \emph{Lectures on the geometry of quantization},
+  ser. Berkeley Mathematics Lecture Notes.\hskip 1em plus 0.5em minus
+  0.4em\relax Providence, RI: American Mathematical Society, 1997, vol.~8.
+
+\bibitem{Lee2006}
+J.~M. Lee, \emph{Introduction to smooth manifolds}, ser. Graduate Texts in
+  Mathematics.\hskip 1em plus 0.5em minus 0.4em\relax Springer-Verlag, 2006,
+  vol. 218.
+
+\end{thebibliography}
 \end{document}
